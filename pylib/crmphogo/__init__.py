@@ -1,8 +1,8 @@
+# -*- coding: utf-8 -*-
 # This source file is part of the Phogo project
 # https://github.com/CRM-UAM/Phogo
 # Released under the GNU General Public License Version 3
 # Club de Robotica-Mecatronica, Universidad Autonoma de Madrid, Spain
-# -.- coding: utf-8 -.-
 from __future__ import print_function  # python2 compatibility
 
 import crmphogo.tortoise as crm
@@ -25,20 +25,20 @@ turtle =r'''
        ~-----||====/~     |==================|       |/~~~~~
         (_(__/  ./     /                    \_\      \.
                (_(___/                         \_____)_)
-                             PHOGO
-                            CRM-UAM
+                              PHOGO
+                             CRM-UAM
 '''
 print(turtle)
 
-t = crm.Tortoise(dirname(crm.__file__) + "/robot_bt_mac.txt")
+tortoise = crm.Tortoise(dirname(crm.__file__) + "/robot_bt_mac.txt")
 
 # define the wrappers
-EmpezarADibujar = t.start_drawing
-DejarDeDibujar = t.stop_drawing
-Avanzar = t.forward
-Retroceder = t.backward
-GirarDerecha = t.turn_right
-GirarIzquierda = t.turn_left
+EmpezarADibujar = tortoise.start_drawing
+DejarDeDibujar = tortoise.stop_drawing
+Avanzar = tortoise.forward
+Retroceder = tortoise.backward
+GirarDerecha = tortoise.turn_right
+GirarIzquierda = tortoise.turn_left
 
 # and export them
 __all__ = ['EmpezarADibujar', 'DejarDeDibujar', 'Avanzar',

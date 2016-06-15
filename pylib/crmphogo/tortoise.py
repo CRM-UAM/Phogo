@@ -1,8 +1,8 @@
 # This source file is part of the Phogo project
+# -*- coding: utf-8 -*-
 # https://github.com/CRM-UAM/Phogo
 # Released under the GNU General Public License Version 3
 # Club de Robotica-Mecatronica, Universidad Autonoma de Madrid, Spain
-# -.- coding: utf-8 -.-
 from __future__ import print_function  # python2 compatibility
 
 import sys
@@ -10,7 +10,7 @@ try:
     import bluetooth
 except ImportError:
     print("PyBluez must be installed.")
-    # sys.exit(1)
+    #sys.exit(1)
 import os
 
 

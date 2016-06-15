@@ -10,15 +10,17 @@ import time
 
 robot = dict()
 
-def add_new_robot(id,mac_address):
+
+def add_new_robot(id, mac_address):
     robot[id] = dict()
     robot[id]["mac_address"] = mac_address
     robot[id]["status"] = "Uninitialized"
     robot[id]["socket"] = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
 
-add_new_robot(1,'98:D3:31:B2:DD:F9')
-add_new_robot(2,'98:D3:31:20:1A:4B')
-add_new_robot(3,'98:D3:31:20:1A:58')
+add_new_robot(1, '98:D3:31:B2:DD:F9')
+add_new_robot(2, '98:D3:31:20:1A:4B')
+add_new_robot(3, '98:D3:31:20:1A:58')
+
 
 def is_connected(id):
     try:
@@ -27,13 +29,16 @@ def is_connected(id):
         return False
     return True
 
+
 def maintain_bluetooth_connection(id):
-    if is_connected(id): return
+    if is_connected(id):
+        return
     robot[id]["status"] = "Uninitialized"
     BT_socket = robot[id]["socket"]
-    print("Connecting to robot "+str(id)+", MAC: "+robot[id]["mac_address"])
+    print("Connecting to robot " + str(id) +
+          ", MAC: " + robot[id]["mac_address"])
     try:
-        BT_socket.connect((robot[id]["mac_address"], 1)) # port=1
+        BT_socket.connect((robot[id]["mac_address"], 1))  # port=1
         BT_socket.settimeout(2)
         print("Connected")
         robot[id]["status"] = "Connected"
@@ -46,10 +51,9 @@ while(True):
     for id in robot.keys():
         maintain_bluetooth_connection(id)
         maintain_socket_connection(id)
-        
+
         read_from_socket(id)
         send_to_bluetooth(id)
-        
+
         read_from_bluetooth(id)
         send_to_socket(id)
-

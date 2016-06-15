@@ -13,4 +13,3 @@ if len(nearby_devices) > 0:
     print(nearby_devices)
 else:
     print("Oops! No devices were found :-(")
-

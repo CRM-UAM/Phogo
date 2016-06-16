@@ -6,10 +6,11 @@
 from __future__ import print_function  # python2 compatibility
 
 import crmphogo.tortoise as crm
+
 from os.path import dirname
 
 __logo_source = "http://www.ascii-code.com/ascii-art/animals/reptiles/turtles.php"
-turtle =r'''
+turtle = r'''
                              ___-------___
                          _-~~             ~~-_
                       _-~                    /~-_

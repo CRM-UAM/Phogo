@@ -34,30 +34,41 @@ chassis_thirdstand_height = -floor_Z-chassis_thirdstand_diameter/2;
 screw_diam = 3.5; // diameter for tight fit
 screw_tolerance = 0.5; // loose fit
 
-ultrasound_posY = -chassis_width/2+25;
+ultrasound_posY = -chassis_width/2+22;
 ultrasound_support_len = 8;
 ultrasound_support_X = 10;
 ultrasound_support_Y = 2.5;
 ultrasound_support_tolerance = 0.5;
 ultrasound_support_thickness = 2;
 
-module pen() {
+module pen_support_vitamins() {
     color("lightblue") translate([0,0,pen_tip_posZ]) {
         translate([0,0,15]) cylinder(r=pen_diameter/2, h=pen_len-15);
         cylinder(r1=1,r2=pen_diameter/2+pen_holder_tolerance, h=15);
     }
+    translate([-3,-8-pen_diameter/2,chassis_thickness])
+        color("gray") alignds420([-18,0,17], [-90,0,-90]); // mini-servo para el rotulador
 }
 
 module pen_support(holes=false) {
-    if(holes)
+    if(holes) {
         translate([0,0,pen_tip_posZ])
             cylinder(r=pen_diameter/2+pen_holder_tolerance, h=pen_len);
-    else
+        // Agujeros para sujetar el mini-servo
+        translate([-3,-8-pen_diameter/2,0]) cube([3,14,chassis_thickness*3],center=true);
+        translate([-8.5,-pen_diameter/2-1,0]) cube([5,2,chassis_thickness*3],center=true);
+        translate([-8.5,-pen_diameter/2-1-14,0]) cube([5,2,chassis_thickness*3],center=true);
+        // Agujero para el cable del mini-servo
+        translate([-26,-8-pen_diameter/2,0]) cube([4,10,chassis_thickness*3],center=true);
+        // Agujeros para los cables de la electronica
+        translate([0,pen_diameter/2+pen_holder_thickness+6/2,0]) cube([15,6,chassis_thickness*3],center=true);
+        translate([0,chassis_len-chassis_width/2-chassis_thirdstand_diameter-6/2,0]) cube([15,6,chassis_thickness*3],center=true);
+    } else
         translate([0,0,-pen_holder_height])
             cylinder(r=pen_diameter/2+pen_holder_thickness, h=pen_holder_height+0.1);
 }
 
-module servo(holes=false,wheel=false) {
+module continuous_rotation_servo(holes=false,wheel=false) {
     if(holes) {
         // Agujeros para las bridas
         translate([-2.5,-15,0]) cube([2,5,chassis_thickness*3],center=true);
@@ -67,17 +78,17 @@ module servo(holes=false,wheel=false) {
     } else {
         color("gray") futabas3003([-28,30,-20], [0,-90,180]);
         if(wheel) translate([12,0,-10]) rotate([0,90,0]) {
-            Servo_wheel_6_arm_horn();
-            color("gray") horn6();
+            Servo_wheel_6_arm_horn(); // Ruedas impresas
+            color("gray") horn6(); // Soporte servo 6 brazos
         }
     }
 }
 
-module two_servos(holes=false,wheels=false) {
+module main_motors(holes=false,wheels=false) {
     translate([-servo_separation/2,0,0])
-        mirror([1,0,0]) servo(holes,wheels);
+        mirror([1,0,0]) continuous_rotation_servo(holes,wheels);
     translate([servo_separation/2,0,0])
-        servo(holes,wheels);
+        continuous_rotation_servo(holes,wheels);
 }
 
 // From: https://github.com/Obijuan/printbot_part_library/tree/master/sensors/ultrasound
@@ -95,11 +106,28 @@ module ultrasound_support(holes=false) {
             translate([0,0,-ultrasound_support_len/2+0.1]) cube([ultrasound_support_X+2*ultrasound_support_thickness,ultrasound_support_Y+2*ultrasound_support_thickness,ultrasound_support_len],center=true);
 }
 
+module battery(holes=false) {
+    translate([0,50,0])
+    if(holes) {
+        translate([-15,14,0]) cube([5,2,chassis_thickness*3],center=true);
+        translate([-15,-14,0]) cube([5,2,chassis_thickness*3],center=true);
+        translate([15,14,0]) cube([5,2,chassis_thickness*3],center=true);
+        translate([15,-14,0]) cube([5,2,chassis_thickness*3],center=true);
+    } else {
+        color("pink") translate([0,0,-15/2]) cube([52,25,15],center=true);
+    }
+}
+
 // From: https://github.com/bq/zum/tree/master/zum-bt328/stl
-module electronics() {
-    color("lightgray")
-    translate([0,35,0])
-    translate([34.5,26.5,chassis_thickness+1.6]) rotate([0,0,180]) import("libs/zum_bt_328.stl");
+module arduino(holes=false) {
+    translate([0,39,2])
+    if(holes) {
+        translate([19.25,-24.25,0]) cylinder(r=screw_diam/2, h=chassis_thickness*5, center=true);
+        translate([20.5,24,0]) cylinder(r=screw_diam/2, h=chassis_thickness*5, center=true);
+        translate([-31.5,19,0]) cylinder(r=screw_diam/2, h=chassis_thickness*5, center=true);
+        translate([-31.5,-9,0]) cylinder(r=screw_diam/2, h=chassis_thickness*5, center=true);
+        for(i=[-1,1]) for(j=[-1,1]) translate([10*i,10*j,0]) cylinder(r=screw_diam/2, h=chassis_thickness*5, center=true);
+    } else color("lightgray") translate([34.5,26.5,chassis_thickness+1.6]) rotate([0,0,180]) import("libs/zum_bt_328.stl");
 }
 
 module thirdstand() {
@@ -110,9 +138,17 @@ module thirdstand() {
 }
 
 module text_on_chassis() {
-    translate([0,chassis_len-chassis_width/2-9,0])
-    rotate([0,0,180]) scale([1.5,1,1]) translate([0,0,chassis_thickness-1.5]) linear_extrude(height=10) {
+    translate([0,chassis_len-chassis_width/2-7,0])
+    *rotate([0,0,180]) scale([1.5,1,1]) translate([0,0,chassis_thickness-1.5]) linear_extrude(height=10) {
         text("PHOGO",size=10,font="Liberation Sans",halign="center",valign="center",$fn=16);
+    }
+    translate([0,3,0])
+    rotate([0,0,180]) translate([0,0,chassis_thickness-1.5]) linear_extrude(height=10) {
+        text("CRM    UAM",size=10,font="Liberation Sans",halign="center",valign="center",$fn=16);
+    }
+    translate([0,-chassis_width/4-2,0])
+    rotate([0,0,180]) translate([0,0,chassis_thickness-1.5]) linear_extrude(height=10) {
+        text("L             R",size=10,font="Liberation Sans",halign="center",valign="center",$fn=16);
     }
 }
 
@@ -131,19 +167,23 @@ module chassis() {
             ultrasound_support();
         }
         pen_support(holes=true);
-        two_servos(holes=true);
+        main_motors(holes=true);
         ultrasound_support(holes=true);
         text_on_chassis();
+        arduino(holes=true);
+        battery(holes=true);
     }
 }
 
 module non_3D_printed() {
-    two_servos(wheels=true);
-    pen();
+    main_motors(wheels=true);
+    pen_support_vitamins();
     ultrasound();
-    electronics();
+    arduino();
+    battery();
 }
 
 chassis();
 non_3D_printed();
+
 

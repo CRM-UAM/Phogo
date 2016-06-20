@@ -3,7 +3,15 @@
 # https://github.com/CRM-UAM/Phogo
 # Released under the GNU General Public License Version 3
 # Club de Robotica-Mecatronica, Universidad Autonoma de Madrid, Spain
-from __future__ import print_function  # python2 compatibility
+
+
+# python2 compatibility
+from __future__ import print_function
+try:
+    input = raw_input
+except:
+    pass
+
 
 import sys
 try:
@@ -18,7 +26,7 @@ class TortoiseError(Exception):
     pass
 
 
-class TortoiseBT(object):
+class _TortoiseBT(object):
     """docstring for TortoiseBT"""
 
     def __init__(self, host):
@@ -26,10 +34,8 @@ class TortoiseBT(object):
         self._host = host
 
         self._connected = False
-        if not self.connect():
-            raise TortoiseError('Error de conexión BT')
 
-    def connect(self):
+    def _connect(self):
         if not self._connected:
             for i in range(3):
                 try:
@@ -37,12 +43,31 @@ class TortoiseBT(object):
                 except bt.BluetoothError as bte:
                     print('Intento ({}) de conexión a {} fallido: {}'.format(
                         i, self._host, bte.message))
-                    pass
+                else:
+                    break
             else:
-                print("No se pudo establecer la conexión Bluetooth.")
-                return False
+                raise TortoiseError(
+                    "No se pudo establecer la conexión Bluetooth con {}".format(self._host))
             self._connected = True
         return self._connected
+
+    def send(self, data):
+        """lazy initialization. On 1st send"""
+        if self._connected or self._connect():
+            try:
+                return self.bt_socket.send(data)
+            except bt.BluetoothError as bte:
+                pass
+
+        raise TortoiseError('Error de conexión BT')
+
+    def receive(self, buff=1024):
+        if self._connected:
+            return self.bt_socket.recv(buff)
+        raise TortoiseError('Error de conexión BT')
+
+    def __repr__(self):
+        return str(self._host)
 
 
 class Tortoise(object):
@@ -59,45 +84,78 @@ class Tortoise(object):
                 mac = mf.read().rstrip()
         except:
             print("El archivo '{}' no existe.".format(macfile))
-            self.mac = input("Introduce la MAC del BT de la Tortuga: ")
+            mac = input("Introduce la MAC del BT de la Tortuga: ")
 
         if mac:
-            self._com = TortoiseBT(mac)
+            self._bt = _TortoiseBT(mac)
 
         print(self, "-> CREATED")
 
     def start_drawing(self):
         """Empieza a dibujar"""
         print(self, "-> start_drawing")
+        cmd = 'PD'
+        if not self._communicate(cmd) == 'OK':
+            sys.exit(1)
 
     def stop_drawing(self):
         """Deja de dibujar"""
         print(self, "-> stop_drawing")
+        cmd = 'PU'
+        if not self._communicate(cmd) == 'OK':
+            sys.exit(1)
 
     def forward(self, units=10):
         """Avanza"""
         print(self, "-> forward", units)
+        cmd = 'FD {}'.format(units)
+        if not self._communicate(cmd) == 'OK':
+            sys.exit(1)
 
     def backward(self, units=10):
         """Retrocede"""
         print(self, "-> backward", units)
+        cmd = 'BK {}'.format(units)
+        if not self._communicate(cmd) == 'OK':
+            sys.exit(1)
 
     def turn_right(self, deg=90):
         """Gira 90º en sentido horario"""
         print(self, "-> turn_right", deg)
+        cmd = 'RT {}'.format(deg)
+        if not self._communicate(cmd) == 'OK':
+            sys.exit(1)
 
-    def turn_left(self, deg=-90):
+    def turn_left(self, deg=90):
         """Gira 90º en sentido antihorario"""
         print(self, "-> turn_left", deg)
+        cmd = 'LT {}'.format(deg)
+        if not self._communicate(cmd) == 'OK':
+            sys.exit(1)
 
-    def _comm(self, data):
-        """La idea es que esta funcion envíe la info y reciba el OK"""
-        pass
+    def read_sensor(self):
+        """Lee el sensor de proximidad"""
+        print(self, "-> read_sensor")
+        cmd = 'OE'
+        sensor = self._communicate(cmd)
+        if not sensor:
+            sys.exit(1)
+        else:
+            return int(float(sensor))
+
+    def _communicate(self, data):
+        """Envia y recibe"""
+        print('{:<10} -> '.format(data), end='')
+        try:
+            if data == self._bt.send(data):
+                r = self._bt.receive()
+                print(r)
+                return r
+        except:
+            pass
+            print('ERROR')
 
     def __repr__(self):
         """Representacion de la torutga para los print.
         Pretende ser una tortuga con la MAC en el caparazon xD"""
-        return "}(" + self._com._host + "){o"
-
-    def run_program(self):
-        print(self, "-> run_program")
+        return "}(" + str(self._com) + "){o"

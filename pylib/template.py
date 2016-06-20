@@ -15,7 +15,6 @@ from crmphogo import *
 Avanzar()
 
 
-
 # se puede hacer que las ordenes se almacenen
 # en un buffer y se manden secuencialmente
 # al ejecutar la ultima linea 'EjecutarPrograma'
@@ -23,4 +22,3 @@ Avanzar()
 #    - hay un buffer
 # o ir mandando las ordenes segun se ejecutan
 #    - mantener abierto el socket (servidor DEP)
-

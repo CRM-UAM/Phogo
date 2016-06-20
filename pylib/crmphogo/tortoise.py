@@ -10,29 +10,39 @@ try:
     import bluetooth as bt
 except ImportError:
     print("PyBluez must be installed.")
-    #sys.exit(1)
+    # sys.exit(1)
 import os
 
-class TortoiseBTClient(object):
+
+class TortoiseError(Exception):
+    pass
+
+
+class TortoiseBT(object):
     """docstring for TortoiseBT"""
-    def __init__(self, host, port):
-        self.bt_socket = bt.BluetoothSocket( bt.RFCOMM )
+
+    def __init__(self, host):
+        self.bt_socket = bt.BluetoothSocket(bt.RFCOMM)
         self._host = host
-        self._port = port
 
         self._connected = False
+        if not self.connect():
+            raise TortoiseError('Error de conexión BT')
 
     def connect(self):
         if not self._connected:
             for i in range(3):
-                self.bt_socket.connect((self._host, self._port))
+                try:
+                    self.bt_socket.connect((self._host, 1))
+                except bt.BluetoothError as bte:
+                    print('Intento ({}) de conexión a {} fallido: {}'.format(
+                        i, self._host, bte.message))
+                    pass
             else:
                 print("No se pudo establecer la conexión Bluetooth.")
-                sys.exit(1)
+                return False
             self._connected = True
         return self._connected
-
-    
 
 
 class Tortoise(object):
@@ -43,12 +53,16 @@ class Tortoise(object):
     def __init__(self, macfile):
         """ Inicia el objeto con la MAC extraida del archivo. Habra que hacer
         comprobaciones y puede que algun testeo u otras formas de definirlo"""
+        mac = None
         try:
             with open(macfile, "r") as mf:
-                self.mac = mf.read().rstrip()
+                mac = mf.read().rstrip()
         except:
             print("El archivo '{}' no existe.".format(macfile))
             self.mac = input("Introduce la MAC del BT de la Tortuga: ")
+
+        if mac:
+            self._com = TortoiseBT(mac)
 
         print(self, "-> CREATED")
 
@@ -75,7 +89,7 @@ class Tortoise(object):
     def turn_left(self, deg=-90):
         """Gira 90º en sentido antihorario"""
         print(self, "-> turn_left", deg)
-        
+
     def _comm(self, data):
         """La idea es que esta funcion envíe la info y reciba el OK"""
         pass
@@ -83,7 +97,7 @@ class Tortoise(object):
     def __repr__(self):
         """Representacion de la torutga para los print.
         Pretende ser una tortuga con la MAC en el caparazon xD"""
-        return "}(" + self.mac + "){o"
+        return "}(" + self._com._host + "){o"
 
     def run_program(self):
         print(self, "-> run_program")

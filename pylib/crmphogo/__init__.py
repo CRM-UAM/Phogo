@@ -9,7 +9,7 @@ import crmphogo.tortoise as crm
 
 from os.path import dirname
 
-__logo_source = "http://www.ascii-code.com/ascii-art/animals/reptiles/turtles.php"
+#__logo_source: http://www.ascii-code.com/ascii-art/animals/reptiles/turtles.php
 turtle = r'''
                              ___-------___
                          _-~~             ~~-_
@@ -23,7 +23,7 @@ turtle = r'''
  \         \^\\         \                  /               \     /
    \         ||           \______________/      _-_       //\__//
      \       ||------_-~~-_ ------------- \ --/~   ~\    || __/
-       ~-----||====/~     |==================|       |/~~~~~
+       ~-----||====/~   /_|==================|       |/~~~~~
         (_(__/  ./     /                    \_\      \.
                (_(___/                         \_____)_)
                               PHOGO
@@ -40,7 +40,8 @@ Avanzar = tortoise.forward
 Retroceder = tortoise.backward
 GirarDerecha = tortoise.turn_right
 GirarIzquierda = tortoise.turn_left
+LeerSensor = tortoise.read_sensor
 
 # and export them
 __all__ = ['EmpezarADibujar', 'DejarDeDibujar', 'Avanzar',
-           'Retroceder', 'GirarDerecha', 'GirarIzquierda']
+           'Retroceder', 'GirarDerecha', 'GirarIzquierda', 'LeerSensor']

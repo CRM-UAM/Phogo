@@ -20,6 +20,7 @@ except ImportError:
     print("PyBluez must be installed.")
     # sys.exit(1)
 import os
+import re
 
 
 class TortoiseError(Exception):
@@ -37,7 +38,7 @@ class _TortoiseBT(object):
 
     def _connect(self):
         if not self._connected:
-            for i in range(3):
+            for i in range(3):  # we try to connect 3 times at most
                 try:
                     self.bt_socket.connect((self._host, 1))
                 except bt.BluetoothError as bte:
@@ -66,6 +67,10 @@ class _TortoiseBT(object):
             return self.bt_socket.recv(buff)
         raise TortoiseError('Error de conexión BT')
 
+    def _disconnect(self):
+        if self._connected:
+            self.bt_socket.close()
+
     def __repr__(self):
         return str(self._host)
 
@@ -81,12 +86,13 @@ class Tortoise(object):
         mac = None
         try:
             with open(macfile, "r") as mf:
-                mac = mf.read().rstrip()
+                mac = mf.read().strip()
         except:
             print("El archivo '{}' no existe.".format(macfile))
-            mac = input("Introduce la MAC del BT de la Tortuga: ")
+            mac = input("Introduce la MAC del BT de la Tortuga: ").strip()
 
-        if mac:
+        # tiene que ser una mac valida
+        if re.match("[0-9a-fA-F]{2}([-:])[0-9a-fA-F]{2}(\\1[0-9a-fA-F]{2}){4}$", mac):
             self._bt = _TortoiseBT(mac)
 
         print(self, "-> CREATED")
@@ -95,67 +101,68 @@ class Tortoise(object):
         """Empieza a dibujar"""
         print(self, "-> start_drawing")
         cmd = 'PD'
-        if not self._communicate(cmd) == 'OK':
+        if not self._communicate(cmd, convert_func=lambda x: x.strip().upper()) == 'OK':
             sys.exit(1)
 
     def stop_drawing(self):
         """Deja de dibujar"""
         print(self, "-> stop_drawing")
         cmd = 'PU'
-        if not self._communicate(cmd) == 'OK':
+        if not self._communicate(cmd, convert_func=lambda x: x.strip().upper()) == 'OK':
             sys.exit(1)
 
     def forward(self, units=10):
         """Avanza"""
         print(self, "-> forward", units)
         cmd = 'FD {}'.format(units)
-        if not self._communicate(cmd) == 'OK':
+        if not self._communicate(cmd, convert_func=lambda x: x.strip().upper()) == 'OK':
             sys.exit(1)
 
     def backward(self, units=10):
         """Retrocede"""
         print(self, "-> backward", units)
         cmd = 'BK {}'.format(units)
-        if not self._communicate(cmd) == 'OK':
+        if not self._communicate(cmd, convert_func=lambda x: x.strip().upper()) == 'OK':
             sys.exit(1)
 
     def turn_right(self, deg=90):
         """Gira 90º en sentido horario"""
         print(self, "-> turn_right", deg)
         cmd = 'RT {}'.format(deg)
-        if not self._communicate(cmd) == 'OK':
+        if not self._communicate(cmd, convert_func=lambda x: x.strip().upper()) == 'OK':
             sys.exit(1)
 
     def turn_left(self, deg=90):
         """Gira 90º en sentido antihorario"""
         print(self, "-> turn_left", deg)
         cmd = 'LT {}'.format(deg)
-        if not self._communicate(cmd) == 'OK':
+        if not self._communicate(cmd, convert_func=lambda x: x.strip().upper()) == 'OK':
             sys.exit(1)
 
     def read_sensor(self):
         """Lee el sensor de proximidad"""
         print(self, "-> read_sensor")
         cmd = 'OE'
-        sensor = self._communicate(cmd)
+        sensor = self._communicate(cmd, convert_func=lambda x: int(float(x)))
         if not sensor:
             sys.exit(1)
         else:
-            return int(float(sensor))
+            return sensor
 
-    def _communicate(self, data):
+    def _communicate(self, data, convert_func=lambda x: x):
         """Envia y recibe"""
         print('{:<10} -> '.format(data), end='')
         try:
             if data == self._bt.send(data + '\n').strip():
-                r = self._bt.receive()
+                r = convert_func(self._bt.receive())
                 print(r)
                 return r
         except:
             pass
         print('ERROR')
+        return None  # return None to evaluate False on any command
 
     def __repr__(self):
-        """Representacion de la torutga para los print.
+        """Representacion de la tortuga para los print.
         Pretende ser una tortuga con la MAC en el caparazon xD"""
         return "}(" + str(self._com) + "){o"

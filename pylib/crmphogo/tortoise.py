@@ -147,7 +147,7 @@ class Tortoise(object):
         """Envia y recibe"""
         print('{:<10} -> '.format(data), end='')
         try:
-            if data == self._bt.send(data):
+            if data == self._bt.send(data + '\n').strip():
                 r = self._bt.receive()
                 print(r)
                 return r

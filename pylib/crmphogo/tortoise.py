@@ -7,20 +7,21 @@
 
 # python2 compatibility
 from __future__ import print_function
-try:
-    input = raw_input
-except:
-    pass
-
 
 import sys
+import os
+import re
+
 try:
     import bluetooth as bt
 except ImportError:
     print("PyBluez must be installed.")
     # sys.exit(1)
-import os
-import re
+
+try:
+    input = raw_input
+except:
+    pass
 
 
 class TortoiseError(Exception):
@@ -33,7 +34,6 @@ class _TortoiseBT(object):
     def __init__(self, host):
         self.bt_socket = bt.BluetoothSocket(bt.RFCOMM)
         self._host = host
-
         self._connected = False
 
     def _connect(self):
@@ -58,7 +58,7 @@ class _TortoiseBT(object):
             try:
                 return self.bt_socket.send(data)
             except bt.BluetoothError as bte:
-                pass
+                raise TortoiseError(bte.message)
 
         raise TortoiseError('Error de conexión BT')
 
@@ -67,9 +67,10 @@ class _TortoiseBT(object):
             return self.bt_socket.recv(buff)
         raise TortoiseError('Error de conexión BT')
 
-    def _disconnect(self):
+    def disconnect(self):
         if self._connected:
             self.bt_socket.close()
+            self._connected = False
 
     def __repr__(self):
         return str(self._host)
@@ -91,7 +92,7 @@ class Tortoise(object):
             print("El archivo '{}' no existe.".format(macfile))
             mac = input("Introduce la MAC del BT de la Tortuga: ").strip()
 
-        # tiene que ser una mac valida
+        # tiene que ser una MAC valida
         if re.match("[0-9a-fA-F]{2}([-:])[0-9a-fA-F]{2}(\\1[0-9a-fA-F]{2}){4}$", mac):
             self._bt = _TortoiseBT(mac)
 
@@ -126,14 +127,14 @@ class Tortoise(object):
             sys.exit(1)
 
     def turn_right(self, deg=90):
-        """Gira 90º en sentido horario"""
+        """Gira en sentido horario, 90º por defecto"""
         print(self, "-> turn_right", deg)
         cmd = 'RT {}'.format(deg)
         if not self._communicate(cmd, convert_func=lambda x: x.strip().upper()) == 'OK':
             sys.exit(1)
 
     def turn_left(self, deg=90):
-        """Gira 90º en sentido antihorario"""
+        """Gira en sentido antihorario, 90º por defecto"""
         print(self, "-> turn_left", deg)
         cmd = 'LT {}'.format(deg)
         if not self._communicate(cmd, convert_func=lambda x: x.strip().upper()) == 'OK':
@@ -144,25 +145,29 @@ class Tortoise(object):
         print(self, "-> read_sensor")
         cmd = 'OE'
         sensor = self._communicate(cmd, convert_func=lambda x: int(float(x)))
-        if not sensor:
-            sys.exit(1)
-        else:
+        if sensor:
             return sensor
+        else:
+            sys.exit(1)
 
     def _communicate(self, data, convert_func=lambda x: x):
         """Envia y recibe"""
-        print('{:<10} -> '.format(data), end='')
+        print(self, '{:<10} -> '.format(data), end='')
         try:
             if data == self._bt.send(data + '\n').strip():
                 r = convert_func(self._bt.receive())
                 print(r)
                 return r
-        except:
-            pass
+        except TortoiseError as te:
+            print('ERROR')
+            self._bt.disconnect()
+            print(te.message, file=sys.stderr)
+            sys.exit(1)
+        # if OK, should not get here
         print('ERROR')
         return None  # return None to evaluate False on any command
 
     def __repr__(self):
         """Representacion de la tortuga para los print.
         Pretende ser una tortuga con la MAC en el caparazon xD"""
-        return "}(" + str(self._com) + "){o"
+        return "}(" + str(self._bt) + "){o"

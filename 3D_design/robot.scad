@@ -11,7 +11,7 @@ $fs = 0.5; // Minimum fragment size [mm]
 
 use <libs/MCAD/servos.scad>
 use <libs/Servo-wheel.scad>
-use <build_plate.scad>
+use <libs/build_plate.scad>
 
 wheel_diameter = 42;
 
@@ -71,6 +71,20 @@ module pen_support(holes=false) {
         translate([0,0,-pen_holder_height])
             cylinder(r=pen_diameter/2+pen_holder_thickness, h=pen_holder_height+0.1);
 }
+
+module pen_holder(holes=false) {
+    translate([0,0,40])
+        difference() {
+            union() {
+                cylinder(r=15+pen_diameter/2, h=1);
+                difference() {
+                    for(i=[-1,1]) rotate([90,0,45*i]) cylinder(r=14+pen_diameter/2, h=4, center=true);
+                    rotate([180,0,0]) cylinder(r=15+pen_diameter/2, h=100);
+                }
+            }
+            translate([0,0,-1]) cylinder(r1=pen_diameter/2+pen_holder_tolerance,r2=pen_diameter/2-pen_holder_tolerance, h=15+pen_diameter/2+2);
+        }
+    }
 
 module continuous_rotation_servo(holes=false,wheel=false) {
     if(holes) {
@@ -187,6 +201,7 @@ module non_3D_printed() {
     battery();
 }
 
+pen_holder();
 chassis();
 non_3D_printed();
 

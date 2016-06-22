@@ -3,33 +3,37 @@
 // Released under the GNU General Public License Version 3
 // Club de Robotica-Mecatronica, Universidad Autonoma de Madrid, Spain
 
+
+
 // Increase the resolution of default shapes
 $fa = 5; // Minimum angle for fragments [degrees]
 $fs = 0.5; // Minimum fragment size [mm]
 
 use <libs/MCAD/servos.scad>
 use <libs/Servo-wheel.scad>
+use <build_plate.scad>
 
 wheel_diameter = 42;
 
 floor_Z = -wheel_diameter;
 
-pen_diameter = 10;
-pen_len = 110;
+pen_diameter = 17;
+pen_len = 120;
 pen_holder_tolerance = 0.5;
 pen_holder_thickness = 2;
 pen_holder_height = 35;
 pen_tip_posZ = floor_Z;
+pen_holder_Xoffset = -6;
 
-servo_separation = 75;
-
-chassis_thickness = 3;
-chassis_width = servo_separation+2*8;
-chassis_len = 80+chassis_width/2;
-chassis_corner_radius = 10;
+servo_separation = 75+7;
 
 chassis_thirdstand_diameter = 15;
 chassis_thirdstand_height = -floor_Z-chassis_thirdstand_diameter/2;
+
+chassis_thickness = 3;
+chassis_width = servo_separation+2*8;
+chassis_len = 70+chassis_width/2;
+chassis_corner_radius = chassis_thirdstand_diameter/2;
 
 screw_diam = 3.5; // diameter for tight fit
 screw_tolerance = 0.5; // loose fit
@@ -43,10 +47,10 @@ ultrasound_support_thickness = 2;
 
 module pen_support_vitamins() {
     color("lightblue") translate([0,0,pen_tip_posZ]) {
-        translate([0,0,15]) cylinder(r=pen_diameter/2, h=pen_len-15);
-        cylinder(r1=1,r2=pen_diameter/2+pen_holder_tolerance, h=15);
+        translate([0,0,25]) cylinder(r=pen_diameter/2, h=pen_len-25);
+        cylinder(r1=1.5,r2=pen_diameter/2+pen_holder_tolerance, h=25);
     }
-    translate([-3,-8-pen_diameter/2,chassis_thickness])
+    translate([-3+pen_holder_Xoffset,-8-pen_diameter/2,chassis_thickness])
         color("gray") alignds420([-18,0,17], [-90,0,-90]); // mini-servo para el rotulador
 }
 
@@ -55,11 +59,11 @@ module pen_support(holes=false) {
         translate([0,0,pen_tip_posZ])
             cylinder(r=pen_diameter/2+pen_holder_tolerance, h=pen_len);
         // Agujeros para sujetar el mini-servo
-        translate([-3,-8-pen_diameter/2,0]) cube([3,14,chassis_thickness*3],center=true);
-        translate([-8.5,-pen_diameter/2-1,0]) cube([5,2,chassis_thickness*3],center=true);
-        translate([-8.5,-pen_diameter/2-1-14,0]) cube([5,2,chassis_thickness*3],center=true);
+        translate([-3+pen_holder_Xoffset,-8-pen_diameter/2,0]) cube([3,14,chassis_thickness*3],center=true);
+        translate([-9+pen_holder_Xoffset,-pen_diameter/2-1,0]) cube([5,2,chassis_thickness*3],center=true);
+        translate([-9+pen_holder_Xoffset,-pen_diameter/2-1-14,0]) cube([5,2,chassis_thickness*3],center=true);
         // Agujero para el cable del mini-servo
-        translate([-26,-8-pen_diameter/2,0]) cube([4,10,chassis_thickness*3],center=true);
+        translate([-26+pen_holder_Xoffset,-8-pen_diameter/2,0]) cube([4,10,chassis_thickness*3],center=true);
         // Agujeros para los cables de la electronica
         translate([0,pen_diameter/2+pen_holder_thickness+6/2,0]) cube([15,6,chassis_thickness*3],center=true);
         translate([0,chassis_len-chassis_width/2-chassis_thirdstand_diameter-6/2,0]) cube([15,6,chassis_thickness*3],center=true);
@@ -131,7 +135,7 @@ module arduino(holes=false) {
 }
 
 module thirdstand() {
-    translate([0,chassis_len-chassis_width/2-chassis_thirdstand_diameter/2,floor_Z+chassis_thirdstand_diameter/2]) union() {
+    for(i=[-1,1]) translate([i*(chassis_width/2-chassis_thirdstand_diameter/2),chassis_len-chassis_width/2-chassis_thirdstand_diameter/2,floor_Z+chassis_thirdstand_diameter/2]) union() {
             sphere(r=chassis_thirdstand_diameter/2);
             cylinder(r=chassis_thirdstand_diameter/2,h=chassis_thirdstand_height+0.1);
         }
@@ -142,13 +146,13 @@ module text_on_chassis() {
     *rotate([0,0,180]) scale([1.5,1,1]) translate([0,0,chassis_thickness-1.5]) linear_extrude(height=10) {
         text("PHOGO",size=10,font="Liberation Sans",halign="center",valign="center",$fn=16);
     }
-    translate([0,3,0])
+    translate([0,2,0])
     rotate([0,0,180]) translate([0,0,chassis_thickness-1.5]) linear_extrude(height=10) {
-        text("CRM    UAM",size=10,font="Liberation Sans",halign="center",valign="center",$fn=16);
+        text("CRM      UAM",size=10,font="Liberation Sans",halign="center",valign="center",$fn=16);
     }
-    translate([0,-chassis_width/4-2,0])
+    translate([0,-chassis_width/4-4,0])
     rotate([0,0,180]) translate([0,0,chassis_thickness-1.5]) linear_extrude(height=10) {
-        text("L             R",size=10,font="Liberation Sans",halign="center",valign="center",$fn=16);
+        text("L              R",size=10,font="Liberation Sans",halign="center",valign="center",$fn=16);
     }
 }
 
@@ -186,4 +190,5 @@ module non_3D_printed() {
 chassis();
 non_3D_printed();
 
-
+//for display only, doesn't contribute to final object
+translate([0,0,floor_Z]) build_plate(3,200,200);

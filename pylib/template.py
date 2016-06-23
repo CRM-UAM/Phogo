@@ -12,7 +12,14 @@ from crmphogo import *
 #                                               #
 #################################################
 
+d = LeerSensor()
+print(d)
+EmpezarADibujar()
+DejarDeDibujar()
 Avanzar()
+Retroceder()
+GirarDerecha()
+GirarIzquierda()
 
 
 # se puede hacer que las ordenes se almacenen

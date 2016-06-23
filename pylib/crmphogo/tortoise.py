@@ -102,42 +102,42 @@ class Tortoise(object):
         """Empieza a dibujar"""
         print(self, "-> start_drawing")
         cmd = 'PD'
-        if not self._communicate(cmd, convert_func=lambda x: x.strip().upper()) == 'OK':
+        if not self._communicate(cmd, convert_func=lambda x: str(x).strip().upper()) == 'OK':
             sys.exit(1)
 
     def stop_drawing(self):
         """Deja de dibujar"""
         print(self, "-> stop_drawing")
         cmd = 'PU'
-        if not self._communicate(cmd, convert_func=lambda x: x.strip().upper()) == 'OK':
+        if not self._communicate(cmd, convert_func=lambda x: str(x).strip().upper()) == 'OK':
             sys.exit(1)
 
     def forward(self, units=10):
         """Avanza"""
         print(self, "-> forward", units)
         cmd = 'FD {}'.format(units)
-        if not self._communicate(cmd, convert_func=lambda x: x.strip().upper()) == 'OK':
+        if not self._communicate(cmd, convert_func=lambda x: str(x).strip().upper()) == 'OK':
             sys.exit(1)
 
     def backward(self, units=10):
         """Retrocede"""
         print(self, "-> backward", units)
         cmd = 'BK {}'.format(units)
-        if not self._communicate(cmd, convert_func=lambda x: x.strip().upper()) == 'OK':
+        if not self._communicate(cmd, convert_func=lambda x: str(x).strip().upper()) == 'OK':
             sys.exit(1)
 
     def turn_right(self, deg=90):
         """Gira en sentido horario, 90º por defecto"""
         print(self, "-> turn_right", deg)
         cmd = 'RT {}'.format(deg)
-        if not self._communicate(cmd, convert_func=lambda x: x.strip().upper()) == 'OK':
+        if not self._communicate(cmd, convert_func=lambda x: str(x).strip().upper()) == 'OK':
             sys.exit(1)
 
     def turn_left(self, deg=90):
         """Gira en sentido antihorario, 90º por defecto"""
         print(self, "-> turn_left", deg)
         cmd = 'LT {}'.format(deg)
-        if not self._communicate(cmd, convert_func=lambda x: x.strip().upper()) == 'OK':
+        if not self._communicate(cmd, convert_func=lambda x: str(x).strip().upper()) == 'OK':
             sys.exit(1)
 
     def read_sensor(self):
@@ -154,10 +154,14 @@ class Tortoise(object):
         """Envia y recibe"""
         print(self, '{:<10} -> '.format(data), end='')
         try:
-            if data == self._bt.send(data + '\n').strip():
+            r = self._bt.send(data + '\n')
+            if data == str(r).strip():
                 r = convert_func(self._bt.receive())
                 print(r)
                 return r
+            else:
+                print("Recibido:", r)
+            
         except TortoiseError as te:
             print('ERROR')
             self._bt.disconnect()

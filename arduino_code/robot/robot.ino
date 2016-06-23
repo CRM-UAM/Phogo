@@ -287,6 +287,9 @@ void loop() {
 		} else if (strcmp(cmd, "OE") == 0) {
 			int dist = measure_distance_cm_filtered(10);
 			Serial.println(dist);
+		} else {
+			/* no se entiende */	
+			Serial.println(-1);
 		}
 		led(OFF);
 	}

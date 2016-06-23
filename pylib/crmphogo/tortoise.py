@@ -23,6 +23,8 @@ try:
 except:
     pass
 
+from time import sleep
+
 
 class TortoiseError(Exception):
     pass
@@ -31,9 +33,11 @@ class TortoiseError(Exception):
 class _TortoiseBT(object):
     """docstring for TortoiseBT"""
 
-    def __init__(self, host):
+    def __init__(self, host, connection_delay=2):
         self.bt_socket = bt.BluetoothSocket(bt.RFCOMM)
+        self.bt_socket.settimeout(2)
         self._host = host
+        self._delay = connection_delay
         self._connected = False
 
     def _connect(self):
@@ -45,6 +49,8 @@ class _TortoiseBT(object):
                     print('Intento ({}) de conexión a {} fallido: {}'.format(
                         i, self._host, bte.message))
                 else:
+                    # apparently, it needs a timeout
+                    sleep(self._delay)
                     break
             else:
                 raise TortoiseError(
@@ -56,7 +62,9 @@ class _TortoiseBT(object):
         """lazy initialization. On 1st send"""
         if self._connected or self._connect():
             try:
-                return self.bt_socket.send(data)
+                if len(str(data)) == self.bt_socket.send(data):
+                    # echo the data sent
+                    return data
             except bt.BluetoothError as bte:
                 raise TortoiseError(bte.message)
 
@@ -96,7 +104,9 @@ class Tortoise(object):
         if re.match("[0-9a-fA-F]{2}([-:])[0-9a-fA-F]{2}(\\1[0-9a-fA-F]{2}){4}$", mac):
             self._bt = _TortoiseBT(mac)
 
-        print(self, "-> CREATED")
+            print(self, "-> CREATED")
+        else:
+            raise TortoiseError("MAC is invalid")
 
     def start_drawing(self):
         """Empieza a dibujar"""
@@ -154,14 +164,10 @@ class Tortoise(object):
         """Envia y recibe"""
         print(self, '{:<10} -> '.format(data), end='')
         try:
-            r = self._bt.send(data + '\n')
-            if data == str(r).strip():
+            if str(data) == str(self._bt.send(data + '\n')).strip():
                 r = convert_func(self._bt.receive())
                 print(r)
                 return r
-            else:
-                print("Recibido:", r)
-            
         except TortoiseError as te:
             print('ERROR')
             self._bt.disconnect()

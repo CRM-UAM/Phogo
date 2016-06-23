@@ -205,6 +205,16 @@ int limit_angle(int deg) {
 	return min(max(deg, 0), 180);
 }
 
+void init_motors() {
+  L_servo.attach(L_SERVO_MOTOR_PIN);
+  R_servo.attach(R_SERVO_MOTOR_PIN);
+  L_servo.write(90); // Set 90deg target angle in order to calibrate the motors
+  R_servo.write(90); // The potentiometer for each servo should be tuned so the motor is stopped
+  delay(500);
+  L_servo.detach();
+  R_servo.detach();
+}
+
 void actuate_motors(float distanceGoal, float targetAngleDeg) {
 	L_servo.attach(L_SERVO_MOTOR_PIN);
 	R_servo.attach(R_SERVO_MOTOR_PIN);
@@ -245,6 +255,7 @@ void setup() {
 	led(ON);
 	init_IMU();
 	pen_move(UP);
+  init_motors();
 	init_ultrasound();
 	calibrate_IMU();
 	led(OFF);

@@ -15,8 +15,9 @@ import re
 try:
     import bluetooth as bt
 except ImportError:
-    print("PyBluez must be installed.")
-    # sys.exit(1)
+    print("PyBluez must be installed."
+          "You can get it issuing the following command 'pip3 install pybluez'")
+    sys.exit(1)
 
 try:
     input = raw_input
@@ -33,10 +34,11 @@ class TortoiseError(Exception):
 class _TortoiseBT(object):
     """docstring for TortoiseBT"""
 
-    def __init__(self, host, connection_delay=2):
+    def __init__(self, host, port=1, connection_delay=2):
         self.bt_socket = bt.BluetoothSocket(bt.RFCOMM)
         self.bt_socket.settimeout(2)
         self._host = host
+        self._port = port
         self._delay = connection_delay
         self._connected = False
 
@@ -44,7 +46,7 @@ class _TortoiseBT(object):
         if not self._connected:
             for i in range(3):  # we try to connect 3 times at most
                 try:
-                    self.bt_socket.connect((self._host, 1))
+                    self.bt_socket.connect((self._host, self._port))
                 except bt.BluetoothError as bte:
                     print('Intento ({}) de conexión a {} fallido: {}'.format(
                         i, self._host, bte.message))
@@ -62,9 +64,7 @@ class _TortoiseBT(object):
         """lazy initialization. On 1st send"""
         if self._connected or self._connect():
             try:
-                if len(str(data)) == self.bt_socket.send(data):
-                    # echo the data sent
-                    return data
+                return self.bt_socket.send(data)
             except bt.BluetoothError as bte:
                 raise TortoiseError(bte.message)
 
@@ -89,19 +89,19 @@ class Tortoise(object):
     Necesita la ruta del archivo donde se encuentra la MAC
     del BT de la Tortuga."""
 
-    def __init__(self, macfile):
+    def __init__(self, mac):
         """ Inicia el objeto con la MAC extraida del archivo. Habra que hacer
         comprobaciones y puede que algun testeo u otras formas de definirlo"""
-        mac = None
-        try:
-            with open(macfile, "r") as mf:
-                mac = mf.read().strip()
-        except:
-            print("El archivo '{}' no existe.".format(macfile))
-            mac = input("Introduce la MAC del BT de la Tortuga: ").strip()
+        #mac = None
+        # try:
+        #    with open(macfile, "r") as mf:
+        #        mac = mf.read().strip()
+        # except:
+        #    print("El archivo '{}' no existe.".format(macfile))
+        #    mac = input("Introduce la MAC del BT de la Tortuga: ").strip()
 
         # tiene que ser una MAC valida
-        if re.match("[0-9a-fA-F]{2}([-:])[0-9a-fA-F]{2}(\\1[0-9a-fA-F]{2}){4}$", mac):
+        if re.match(r'[0-9a-fA-F]{2}([-:])[0-9a-fA-F]{2}(\1[0-9a-fA-F]{2}){4}$', mac):
             self._bt = _TortoiseBT(mac)
 
             print(self, "-> CREATED")
@@ -164,7 +164,7 @@ class Tortoise(object):
         """Envia y recibe"""
         print(self, '{:<10} -> '.format(data), end='')
         try:
-            if str(data) == str(self._bt.send(data + '\n')).strip():
+            if len(data) == self._bt.send(data + '\n') - 1:  # sending worked
                 r = convert_func(self._bt.receive())
                 print(r)
                 return r

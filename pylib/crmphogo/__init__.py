@@ -5,11 +5,27 @@
 # Club de Robotica-Mecatronica, Universidad Autonoma de Madrid, Spain
 from __future__ import print_function  # python2 compatibility
 
-import crmphogo.tortoise as crm
+import re
+import getpass
 
 from os.path import dirname
 
-#__logo_source: http://www.ascii-code.com/ascii-art/animals/reptiles/turtles.php
+_test_robot = '1'
+
+logged_as = getpass.getuser()
+user = re.search(r'\d+$', logged_as)
+# para testear usamos un robot en concreto, sin depender del usuario
+user = user.group() if user else _test_robot
+
+import json
+with open(dirname(__file__) + "/all_robots.json", "r") as rbts:
+    macs = json.loads(rbts.read())
+
+print("Using robot:", user, "{{{}}}".format(macs[user]))
+
+import crmphogo.tortoise as crm
+# __logo_source:
+# http://www.ascii-code.com/ascii-art/animals/reptiles/turtles.php
 turtle = r'''
                              ___-------___
                          _-~~             ~~-_
@@ -31,7 +47,8 @@ turtle = r'''
 '''
 print(turtle)
 
-tortoise = crm.Tortoise(dirname(crm.__file__) + "/robot_bt_mac.txt")
+#tortoise = crm.Tortoise(dirname(crm.__file__) + "/robot_bt_mac.txt")
+tortoise = crm.Tortoise(macs[user])
 
 # define the wrappers
 EmpezarADibujar = tortoise.start_drawing

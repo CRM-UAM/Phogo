@@ -84,12 +84,12 @@ class _TortoiseBT(object):
         ret = ''
         if self._connected:
             try:
-                ret = self.bt_socket.recv(buff).decode("utf-8")
+                #ret = self.bt_socket.recv(buff).decode("utf-8")
                 while not ret.endswith('\n'):
                     ret += self.bt_socket.recv(buff).decode("utf-8")
                 #return self.bt_socket.recv(buff).decode("utf-8")
                 ret = ret.strip()
-                print(ret)
+                #print(ret)
                 return ret
             except:
                 pass
@@ -178,6 +178,7 @@ class Tortoise(object):
         try:
             if len(data) + 1 == self._bt.send(data + '\n'):  # sending worked
                 r = convert_func(self._bt.receive())
+                print(r)
                 return r
         except TortoiseError as te:
             print('ERROR')

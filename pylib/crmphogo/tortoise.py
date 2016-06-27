@@ -43,29 +43,29 @@ class _TortoiseBT(object):
         self._delay = connection_delay
         self._connected = False
         try:
-            if self._connect():
-                print(self, "READY")
+            self._connect()
         except TortoiseError as te:
             print(te)
             sys.exit(1)
 
     def _connect(self):
         if not self._connected:
-            print("Conectando con", self)
+            print("Conectando con", self, end=' ')
             for i in range(3):  # we try to connect 3 times at most
                 try:
+                    print('...', end='')
                     self.bt_socket = bt.BluetoothSocket(bt.RFCOMM)
                     self.bt_socket.connect((self._host, self._port))
                 except BluetoothError as bte:
-                    print('Intento ({}) de conexión a {} fallido: {}'.format(
-                        i + 1, self._host, re.search(r"""(["'])(?:(?=(\\?))\2.)*?\1""", str(bte)).group()))
+                    pass
                 else:
                     self.bt_socket.settimeout(5)
                     # apparently, it needs a timeout
                     # sleep(self._delay)
-                    print("esta conectado")
+                    print(" OK")
                     break
             else:
+                print(" ERROR")
                 raise TortoiseError(
                     "No se pudo establecer la conexión Bluetooth con {}".format(self._host))
             self._connected = True
@@ -87,7 +87,8 @@ class _TortoiseBT(object):
                 ret = self.bt_socket.recv(buff).decode("utf-8")
                 while not ret.endswith('\n'):
                     ret += self.bt_socket.recv(buff).decode("utf-8")
-            #return self.bt_socket.recv(buff).decode("utf-8")
+                #return self.bt_socket.recv(buff).decode("utf-8")
+                ret = ret.strip()
                 print(ret)
                 return ret
             except:
@@ -115,56 +116,55 @@ class Tortoise(object):
         # tiene que ser una MAC valida
         if re.match(r'[0-9a-fA-F]{2}([-:])[0-9a-fA-F]{2}(\1[0-9a-fA-F]{2}){4}$', mac):
             self._bt = _TortoiseBT(mac)
-            print(self._bt.receive().strip().upper())
-            print(self, "-> CREATED")
+            print(self, '->', self._bt.receive().strip().upper())
         else:
             raise TortoiseError("MAC is invalid")
 
     def start_drawing(self):
         """Empieza a dibujar"""
-        print(self, "-> start_drawing")
+        #print(self, "-> start_drawing")
         cmd = 'PD'
         if not self._communicate(cmd, convert_func=lambda x: str(x).strip().upper()) == 'OK':
             sys.exit(1)
 
     def stop_drawing(self):
         """Deja de dibujar"""
-        print(self, "-> stop_drawing")
+        #print(self, "-> stop_drawing")
         cmd = 'PU'
         if not self._communicate(cmd, convert_func=lambda x: str(x).strip().upper()) == 'OK':
             sys.exit(1)
 
-    def forward(self, units=100):
+    def forward(self, units=10):
         """Avanza"""
-        print(self, "-> forward", units)
+        #print(self, "-> forward", units)
         cmd = 'FD {}'.format(units)
         if not self._communicate(cmd, convert_func=lambda x: str(x).strip().upper()) == 'OK':
             sys.exit(1)
 
     def backward(self, units=10):
         """Retrocede"""
-        print(self, "-> backward", units)
+        #print(self, "-> backward", units)
         cmd = 'BK {}'.format(units)
         if not self._communicate(cmd, convert_func=lambda x: str(x).strip().upper()) == 'OK':
             sys.exit(1)
 
     def turn_right(self, deg=90):
         """Gira en sentido horario, 90º por defecto"""
-        print(self, "-> turn_right", deg)
+        #print(self, "-> turn_right", deg)
         cmd = 'RT {}'.format(deg)
         if not self._communicate(cmd, convert_func=lambda x: str(x).strip().upper()) == 'OK':
             sys.exit(1)
 
     def turn_left(self, deg=90):
         """Gira en sentido antihorario, 90º por defecto"""
-        print(self, "-> turn_left", deg)
+        #print(self, "-> turn_left", deg)
         cmd = 'LT {}'.format(deg)
         if not self._communicate(cmd, convert_func=lambda x: str(x).strip().upper()) == 'OK':
             sys.exit(1)
 
     def read_sensor(self):
         """Lee el sensor de proximidad"""
-        print(self, "-> read_sensor")
+        #print(self, "-> read_sensor")
         cmd = 'OE'
         sensor = self._communicate(cmd, convert_func=lambda x: int(float(x)))
         if sensor:
@@ -176,9 +176,8 @@ class Tortoise(object):
         """Envia y recibe"""
         print(self, '{:<10} -> '.format(data), end='')
         try:
-                print("sent", self._bt.send(data + '\n'), "bytes")  # sending worked
+            if len(data) + 1 == self._bt.send(data + '\n'):  # sending worked
                 r = convert_func(self._bt.receive())
-                print("en _communicate:|{}|".format(r))
                 return r
         except TortoiseError as te:
             print('ERROR')

@@ -15,10 +15,10 @@ from crmphogo import *
 
 Avanzar()
 Retroceder()
-GirarDerecha()
+GirarDerecha(180)
 GirarIzquierda()
-EmpezarADibujar()
-DejarDeDibujar()
+#EmpezarADibujar()
+#DejarDeDibujar()
 d = LeerSensor()
 print(d)
 

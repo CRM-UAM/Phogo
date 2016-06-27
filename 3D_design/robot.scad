@@ -23,7 +23,7 @@ pen_holder_tolerance = 0.5;
 pen_holder_thickness = 2;
 pen_holder_height = 35;
 pen_tip_posZ = floor_Z;
-pen_holder_Xoffset = -6;
+pen_holder_Xoffset = 1;
 
 servo_separation = 75+7;
 
@@ -38,7 +38,7 @@ chassis_corner_radius = chassis_thirdstand_diameter/2;
 screw_diam = 3.5; // diameter for tight fit
 screw_tolerance = 0.5; // loose fit
 
-ultrasound_posY = -chassis_width/2+22;
+ultrasound_posY = -chassis_width/2+21;
 ultrasound_support_len = 8;
 ultrasound_support_X = 10;
 ultrasound_support_Y = 2.5;
@@ -58,21 +58,22 @@ module pen_support(holes=false) {
     if(holes) {
         translate([0,0,pen_tip_posZ])
             cylinder(r=pen_diameter/2+pen_holder_tolerance, h=pen_len);
+        cylinder(r1=pen_diameter/2+pen_holder_tolerance, r2=pen_diameter/2+2*pen_holder_tolerance, h=chassis_thickness+0.1);
         // Agujeros para sujetar el mini-servo
-        translate([-3+pen_holder_Xoffset,-8-pen_diameter/2,0]) cube([3,14,chassis_thickness*3],center=true);
-        translate([-9+pen_holder_Xoffset,-pen_diameter/2-1,0]) cube([5,2,chassis_thickness*3],center=true);
-        translate([-9+pen_holder_Xoffset,-pen_diameter/2-1-14,0]) cube([5,2,chassis_thickness*3],center=true);
+        translate([-3+pen_holder_Xoffset,-9-pen_diameter/2,0]) cube([3,14,chassis_thickness*3],center=true);
+        translate([-11+pen_holder_Xoffset,-pen_diameter/2-2,0]) cube([5,2,chassis_thickness*3],center=true);
+        translate([-11+pen_holder_Xoffset,-pen_diameter/2-16,0]) cube([5,2,chassis_thickness*3],center=true);
         // Agujero para el cable del mini-servo
-        translate([-26+pen_holder_Xoffset,-8-pen_diameter/2,0]) cube([4,10,chassis_thickness*3],center=true);
+        translate([-26+pen_holder_Xoffset,-9-pen_diameter/2,0]) cube([4,10,chassis_thickness*3],center=true);
         // Agujeros para los cables de la electronica
         translate([0,pen_diameter/2+pen_holder_thickness+6/2,0]) cube([15,6,chassis_thickness*3],center=true);
-        translate([0,chassis_len-chassis_width/2-chassis_thirdstand_diameter-6/2,0]) cube([15,6,chassis_thickness*3],center=true);
+        translate([0,chassis_len-chassis_width/2-5,0]) cube([15,6,chassis_thickness*3],center=true);
     } else
         translate([0,0,-pen_holder_height])
             cylinder(r=pen_diameter/2+pen_holder_thickness, h=pen_holder_height+0.1);
 }
 
-module pen_holder(holes=false) {
+module pen_holder() {
     translate([0,0,40])
         difference() {
             union() {
@@ -82,7 +83,7 @@ module pen_holder(holes=false) {
                     rotate([180,0,0]) cylinder(r=15+pen_diameter/2, h=100);
                 }
             }
-            translate([0,0,-1]) cylinder(r1=pen_diameter/2+pen_holder_tolerance,r2=pen_diameter/2-pen_holder_tolerance, h=15+pen_diameter/2+2);
+            translate([0,0,-1]) cylinder(r1=pen_diameter/2+2*pen_holder_tolerance,r2=pen_diameter/2-2*pen_holder_tolerance, h=15+pen_diameter/2+2);
         }
     }
 
@@ -138,7 +139,7 @@ module battery(holes=false) {
 
 // From: https://github.com/bq/zum/tree/master/zum-bt328/stl
 module arduino(holes=false) {
-    translate([0,39,2])
+    translate([0,43,2])
     if(holes) {
         translate([19.25,-24.25,0]) cylinder(r=screw_diam/2, h=chassis_thickness*5, center=true);
         translate([20.5,24,0]) cylinder(r=screw_diam/2, h=chassis_thickness*5, center=true);
@@ -162,11 +163,11 @@ module text_on_chassis() {
     }
     translate([0,2,0])
     rotate([0,0,180]) translate([0,0,chassis_thickness-1.5]) linear_extrude(height=10) {
-        text("CRM      UAM",size=10,font="Liberation Sans",halign="center",valign="center",$fn=16);
+        text("CRM      UAM",size=10,font="Liberation Sans :style=Bold",halign="center",valign="center",$fn=16);
     }
     translate([0,-chassis_width/4-4,0])
     rotate([0,0,180]) translate([0,0,chassis_thickness-1.5]) linear_extrude(height=10) {
-        text("L              R",size=10,font="Liberation Sans",halign="center",valign="center",$fn=16);
+        text("L              R",size=10,font="Liberation Sans :style=Bold",halign="center",valign="center",$fn=16);
     }
 }
 

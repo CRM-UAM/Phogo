@@ -12,12 +12,13 @@ from crmphogo import *
 #                                                #
 ##################################################
 
-d = LeerSensor()
-print(d)
-EmpezarADibujar()
-DejarDeDibujar()
+
 Avanzar()
 Retroceder()
 GirarDerecha()
 GirarIzquierda()
+EmpezarADibujar()
+DejarDeDibujar()
+d = LeerSensor()
+print(d)
 

@@ -206,13 +206,13 @@ int limit_angle(int deg) {
 }
 
 void init_motors() {
-  L_servo.attach(L_SERVO_MOTOR_PIN);
-  R_servo.attach(R_SERVO_MOTOR_PIN);
-  L_servo.write(90); // Set 90deg target angle in order to calibrate the motors
-  R_servo.write(90); // The potentiometer for each servo should be tuned so the motor is stopped
-  delay(500);
-  L_servo.detach();
-  R_servo.detach();
+	L_servo.attach(L_SERVO_MOTOR_PIN);
+	R_servo.attach(R_SERVO_MOTOR_PIN);
+	L_servo.write(90); // Set 90deg target angle in order to calibrate the motors
+	R_servo.write(90); // The potentiometer for each servo should be tuned so the motor is stopped
+	delay(500);
+	L_servo.detach();
+	R_servo.detach();
 }
 
 void actuate_motors(float distanceGoal, float targetAngleDeg) {
@@ -244,24 +244,21 @@ void actuate_motors(float distanceGoal, float targetAngleDeg) {
 	R_servo.detach();
 }
 
-
 //--------------------------
 // ****    MAIN         ****
 //--------------------------
-
 void setup() {
 	delay(400);
 	Serial.begin(19200);
 	led(ON);
 	init_IMU();
 	pen_move(UP);
-  init_motors();
+	init_motors();
 	init_ultrasound();
 	calibrate_IMU();
 	led(OFF);
 	Serial.println("READY");
 }
-
 
 void loop() {
 	if (Serial.available()) {
@@ -298,12 +295,8 @@ void loop() {
 		} else if (strcmp(cmd, "OE") == 0) {
 			int dist = measure_distance_cm_filtered(10);
 			Serial.println(dist);
-		} else {
-			/* no se entiende */	
-			Serial.println(-1);
 		}
 		led(OFF);
 	}
 	integrate_IMU();
 }
-

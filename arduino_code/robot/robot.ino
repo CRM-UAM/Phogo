@@ -120,7 +120,7 @@ void init_IMU() {
 	digitalWrite(MPU6050_GND_PIN, LOW);
 
 	Wire.begin(); // Initialise the I2C port
-	Wire.setTimeout(5);
+	Wire.setTimeout(10);
 
 	for (int i = 0; i < 3; i++) { // Reset the IMU a few times
 		IMUwriteReg(MPU6050_PWR_MGMT_1, bit(7));   // DEVICE_RESET to 1 (D7=1)
@@ -219,6 +219,8 @@ void actuate_motors(float distanceGoal, float targetAngleDeg) {
 	L_servo.attach(L_SERVO_MOTOR_PIN);
 	R_servo.attach(R_SERVO_MOTOR_PIN);
 
+  distanceGoal *= 10; // Convert from cm to mm
+
 	float velocity = 10 * (distanceGoal > 0) - 8 * (distanceGoal < 0);
 	float distance_integral = 0;
 
@@ -257,46 +259,49 @@ void setup() {
 	init_ultrasound();
 	calibrate_IMU();
 	led(OFF);
+  while (Serial.available()) Serial.read(); // Flush input buffer
 	Serial.println("READY");
 }
 
 void loop() {
 	if (Serial.available()) {
-		led(ON);
-		bool sendOK = false;
-		char cmd[3];
-		cmd[0] = Serial.read();
-		cmd[1] = Serial.read();
-		cmd[2] = '\0';
-		if (strcmp(cmd, "PD") == 0) {
-			pen_move(DOWN);
-			Serial.println("OK");
+    String line = Serial.readStringUntil('\n');
+    line.trim(); // Skip initial garbage (\n \r and spaces)
+    if ( line.length() >= 2 ) {
+      String command = line.substring(0, 2); // Extract the first two letters
+      String value = line.substring(2); // Extract the rest of the message
+  		led(ON);
+  		if (command == "PD") {
+  			pen_move(DOWN);
+  			Serial.println("OK");
 
-		} else if (strcmp(cmd, "PU") == 0) {
-			pen_move(UP);
-			Serial.println("OK");
+  		} else if (command == "PU") {
+  			pen_move(UP);
+  			Serial.println("OK");
 
-		} else if (strcmp(cmd, "FD") == 0) {
-			actuate_motors(Serial.parseInt(), 0);
-			Serial.println("OK");
+  		} else if (command == "FD") {
+  			actuate_motors(value.toInt(), 0);
+  			Serial.println("OK");
 
-		} else if (strcmp(cmd, "BK") == 0) {
-			actuate_motors(-Serial.parseInt(), 0);
-			Serial.println("OK");
+  		} else if (command == "BK") {
+  			actuate_motors(-value.toInt(), 0);
+  			Serial.println("OK");
 
-		} else if (strcmp(cmd, "RT") == 0) {
-			actuate_motors(0, -Serial.parseInt());
-			Serial.println("OK");
+  		} else if (command == "RT") {
+  			actuate_motors(0, -value.toInt());
+  			Serial.println("OK");
+  
+  		} else if (command == "LT") {
+  			actuate_motors(0, value.toInt());
+  			Serial.println("OK");
 
-		} else if (strcmp(cmd, "LT") == 0) {
-			actuate_motors(0, Serial.parseInt());
-			Serial.println("OK");
+  		} else if (command == "OE") {
+  			int dist = measure_distance_cm_filtered(10);
+  			Serial.println(dist);
 
-		} else if (strcmp(cmd, "OE") == 0) {
-			int dist = measure_distance_cm_filtered(10);
-			Serial.println(dist);
-		}
-		led(OFF);
+  		} else Serial.println("ERROR: UNKNOWN COMMAND");
+  		led(OFF);
+    }
 	}
 	integrate_IMU();
 }

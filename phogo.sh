@@ -2,54 +2,80 @@
 
 FILE=/tmp/phogo_users
 
-CREATE_SHORT_OPT="u:h:p:"
-CREATE_LONG_OPT="user:,home:,password:,help"
+CREATE_SHORT_OPT="u:p:"
+CREATE_LONG_OPT="user:,password:,help"
 
 CLEAN_SHORT_OPT="ah"
 CLEAN_LONG_OPT="all,home"
 
 function usage() {
 	echo "Usage: phogo create [OPTIONS] num_users"
-	echo "       phogo clean [OPTIONS]"
+	echo "       phogo clean"
+	echo ""
+	echo "phogo create : adds num_users to the system, using the options provided"
+	echo "phogo clean  : removes the users added by create"
 	echo ""
 	echo "OPTIONS for create:"
-	echo "  -u, --user       The name given to the users (default: tortoise). It will be appended with a number."
-	echo "  -h, --home       Directory to use as $HOME for the users added (default: /home/<user>)"
+	echo "  -u, --user       The name given to the users (default: tortoise). It will be appended with an ordinal."
 	echo "  -p, --password   The password for the users added (default: crm-uam)"
-	echo ""
-	echo "OPTIONS for clean:"
-	echo "  -a, --all        Remove everything created (users, home, temporary files)"
-	echo "  -h, --home       Keep $HOME directory, don't remove it."
 }
 
 function create() {
 
 	if [ -f $FILE ]; then
-		read -p "A previous run has left some users undeleted. Continue? " -n 1 -r
-		echo    # (optional) move to a new line
-		if ! [[ $REPLY =~ ^[Yy]$ ]]; then
-			exit 0
-		fi
+		echo "There are probably phogo users in this system already."
+		echo "  Use or remove them before adding new ones."
+		echo "  Or delete the file $FILE if they don't exist anymore."
+		exit 1
 	fi
 	
-    # do dangerous stuff
-	echo "HOME:$T_HOME" >> $FILE
+	echo "$T_USER" >> $FILE
 
 	for i in $(seq $NUM_USERS); do
-		echo "USER:$T_USER$i" >> $FILE
-		echo -e "\n\n\n\n\n\n" | adduser --disabled-password --home "$T_HOME" $T_USER$i
+		echo -e "\n\n\n\n\n\n\n" | adduser $T_USER$i
 		echo -e "$T_PASS\n$T_PASS" | passwd $T_USER$i
+
+		#adding PYTHONPATH
+		echo -e "\nexport PYTHONPATH=$(pwd)/pylib:$PYTHONPATH" >> "/home/$T_USER$i/.profile"
 	done
+}
+
+function del_users_starting_by() {
+	local PREFIX=$1
+	local res=0 
+
+	for user in $(awk -F':' '{ print $1}' /etc/passwd | grep -e ^"$PREFIX"); do
+		deluser --remove-home $user
+		let "res &= $?"
+	done
+	return $res
 }
 
 function delete() {
 
+	local all_OK=0
+
 	if ! [ -f $FILE ]; then
 		echo "No users created by phogo on this system"
-		exit 1
+		exit 0
 	fi
 
+	while IFS='' read -r line || [[ -n "$line" ]]; do
+    	del_users_starting_by "$line"
+    	let "all_OK &= $?"
+	done < "$FILE"
+
+	if [ $all_OK ]; then
+		rm "$FILE"
+	else
+		echo "Some users were not removed from the system."
+	fi
 }
+
+if [ "$(id -u)" != "0" ]; then
+	echo "This script must be run as root" 1>&2
+	exit 1
+fi
 
 if [ "$1" == "create" ]; then
 
@@ -63,11 +89,6 @@ if [ "$1" == "create" ]; then
 			-u|--user)
 				echo "user: $2" >&2
 				T_USER=$2
-				shift 2
-				;;
-			-h|--home)
-				echo "home: $2" >&2
-				T_HOME=$2
 				shift 2
 				;;
 			-p|--password)
@@ -100,12 +121,9 @@ if [ "$1" == "create" ]; then
 
 	create
 
-fi
+	echo "T_USER: $T_USER, T_HOME: $T_HOME, T_PASS: $T_PASS, NUM_USERS: $NUM_USERS"
 
-
-echo "T_USER: $T_USER, T_HOME: $T_HOME, T_PASS: $T_PASS, NUM_USERS: $NUM_USERS"
-
-if [ "$1" == "clean" ]; then
+elif [ "$1" == "clean" ]; then
 
 	shift
 
@@ -133,11 +151,7 @@ if [ "$1" == "clean" ]; then
 
 	delete
 
+else
+	usage
 fi
-
-if [ "$(id -u)" != "0" ]; then
-	echo "This script must be run as root" 1>&2
-	exit 1
-fi
-
 

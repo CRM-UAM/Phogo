@@ -9,16 +9,18 @@ from crmphogo import *
 
 print("Primera tanda")
 EmpezarADibujar()
-DejarDeDibujar()
-Avanzar()
-Retroceder()
-GirarDerecha()
-GirarIzquierda()
 
-print("Segunda tanda")
-EmpezarADibujar()
-DejarDeDibujar()
-Avanzar()
-Retroceder()
+Avanzar(2)
 GirarDerecha()
-GirarIzquierda()
+
+Avanzar(2)
+GirarDerecha()
+
+Avanzar(2)
+GirarDerecha()
+
+Avanzar(2)
+GirarDerecha()
+
+DejarDeDibujar()
+

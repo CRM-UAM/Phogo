@@ -15,7 +15,7 @@ try:
     import bluetooth as bt
 except ImportError:
     print("PyBluez must be installed.")
-    print("You can get by typing the following command 'pip3 install pybluez' in your shell")
+    print("You can get it by typing the following command 'pip3 install pybluez' in your shell")
     sys.exit(1)
 
 # shortcut
@@ -34,7 +34,9 @@ class TortoiseError(Exception):
 
 
 class _TortoiseBT(object):
-    """docstring for TortoiseBT"""
+    """Class that performs the BT communication between the
+    computer and the Tortoise itself.
+    """
 
     def __init__(self, host, port=1, connection_delay=2):
         self.bt_socket = None
@@ -72,6 +74,7 @@ class _TortoiseBT(object):
         return self._connected
 
     def send(self, data):
+        """Sends `data` as a byte array."""
         if self._connected:
             try:
                 return self.bt_socket.send(data.encode())
@@ -81,15 +84,16 @@ class _TortoiseBT(object):
         raise TortoiseError('Error de conexión BT: envío')
 
     def receive(self, buff=1024):
+        """Receives whatever there is in the BT buffer and converts it to utf-8."""
         ret = ''
         if self._connected:
             try:
                 #ret = self.bt_socket.recv(buff).decode("utf-8")
                 while not ret.endswith('\n'):
                     ret += self.bt_socket.recv(buff).decode("utf-8")
-                #return self.bt_socket.recv(buff).decode("utf-8")
+                # return self.bt_socket.recv(buff).decode("utf-8")
                 ret = ret.strip()
-                #print(ret)
+                # print(ret)
                 return ret
             except:
                 pass
@@ -105,13 +109,10 @@ class _TortoiseBT(object):
 
 
 class Tortoise(object):
-    """ Este objeto representa la Tortuga. Esto es un borrador.
-    Necesita la ruta del archivo donde se encuentra la MAC
-    del BT de la Tortuga."""
+    """ Este objeto representa la Tortuga."""
 
     def __init__(self, mac):
-        """ Inicia el objeto con la MAC extraida del archivo. Habra que hacer
-        comprobaciones y puede que algun testeo u otras formas de definirlo"""
+        """Inicia el objeto con la MAC con la que se va a comunicar."""
 
         # tiene que ser una MAC valida
         if re.match(r'[0-9a-fA-F]{2}([-:])[0-9a-fA-F]{2}(\1[0-9a-fA-F]{2}){4}$', mac):

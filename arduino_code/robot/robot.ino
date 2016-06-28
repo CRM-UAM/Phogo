@@ -201,16 +201,20 @@ Servo L_servo, R_servo;
 #define R_SERVO_MOTOR_PIN 9
 unsigned long motors_last_ts = 0;
 
+#define VELOCITY_FORWARD 15
+#define VELOCITY_BACKWARD -15
+#define REAL_VELOCITY 100 // mm/s
+
 int limit_angle(int deg) {
 	return min(max(deg, 0), 180);
 }
 
-void init_motors() {
+void calibrate_motors() {
 	L_servo.attach(L_SERVO_MOTOR_PIN);
 	R_servo.attach(R_SERVO_MOTOR_PIN);
 	L_servo.write(90); // Set 90deg target angle in order to calibrate the motors
 	R_servo.write(90); // The potentiometer for each servo should be tuned so the motor is stopped
-	delay(500);
+	delay(10000);
 	L_servo.detach();
 	R_servo.detach();
 }
@@ -221,7 +225,7 @@ void actuate_motors(float distanceGoal, float targetAngleDeg) {
 
   distanceGoal *= 10; // Convert from cm to mm
 
-	float velocity = 10 * (distanceGoal > 0) - 8 * (distanceGoal < 0);
+	float velocity = VELOCITY_FORWARD * (distanceGoal > 0) + VELOCITY_BACKWARD * (distanceGoal < 0);
 	float distance_integral = 0;
 
 	offset_IMU(-targetAngleDeg);
@@ -244,6 +248,9 @@ void actuate_motors(float distanceGoal, float targetAngleDeg) {
 
 	L_servo.detach();
 	R_servo.detach();
+
+  unsigned long ts = millis();
+  while(millis()-ts < 500) integrate_IMU(); // integrate any remaining motion
 }
 
 //--------------------------
@@ -255,7 +262,6 @@ void setup() {
 	led(ON);
 	init_IMU();
 	pen_move(UP);
-	init_motors();
 	init_ultrasound();
 	calibrate_IMU();
 	led(OFF);
@@ -296,12 +302,16 @@ void loop() {
   			Serial.println("OK");
 
   		} else if (command == "OE") {
-  			int dist = measure_distance_cm_filtered(10);
-  			Serial.println(dist);
+        int dist = measure_distance_cm_filtered(10);
+        Serial.println(dist);
 
-  		} else Serial.println("ERROR: UNKNOWN COMMAND");
+      } else if (command == "CA") {
+        calibrate_motors();
+        Serial.println("OK");
+
+      } else Serial.println("ERROR: UNKNOWN COMMAND");
   		led(OFF);
     }
 	}
-	integrate_IMU();
+	//integrate_IMU(); // do not integrate rotations while the robot is static
 }

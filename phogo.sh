@@ -5,9 +5,6 @@ FILE=/tmp/phogo_users
 CREATE_SHORT_OPT="u:p:"
 CREATE_LONG_OPT="user:,password:,help"
 
-CLEAN_SHORT_OPT="ah"
-CLEAN_LONG_OPT="all,home"
-
 function usage() {
 	echo "Usage: phogo create [OPTIONS] num_users"
 	echo "       phogo clean"
@@ -125,33 +122,11 @@ if [ "$1" == "create" ]; then
 
 elif [ "$1" == "clean" ]; then
 
-	shift
-
-	TEMP=$(getopt -o $CLEAN_SHORT_OPT -l $CLEAN_LONG_OPT -- $@)
-	eval set -- "$TEMP"
-
-	while true; do
-		case "$1" in
-			-a|--all)
-				KEEP_HOME=false
-				;;
-			-h|--home)
-				KEEP_HOME=true
-				;;
-			--)
-				break
-				;;
-			*)
-				echo "Invalid option: $1"
-				usage
-				exit 1
-				;;
-		esac
-	done
-
 	delete
 
 else
+
 	usage
+
 fi
 

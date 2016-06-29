@@ -223,7 +223,7 @@ void actuate_motors(float distanceGoal, float targetAngleDeg) {
 	L_servo.attach(L_SERVO_MOTOR_PIN);
 	R_servo.attach(R_SERVO_MOTOR_PIN);
 
-  distanceGoal *= 10; // Convert from cm to mm
+	distanceGoal *= 10; // Convert from cm to mm
 
 	float velocity = VELOCITY_FORWARD * (distanceGoal > 0) + VELOCITY_BACKWARD * (distanceGoal < 0);
 	float distance_integral = 0;
@@ -249,8 +249,8 @@ void actuate_motors(float distanceGoal, float targetAngleDeg) {
 	L_servo.detach();
 	R_servo.detach();
 
-  unsigned long ts = millis();
-  while(millis()-ts < 500) integrate_IMU(); // integrate any remaining motion
+	unsigned long ts = millis();
+	while (millis() - ts < 500) integrate_IMU(); // integrate any remaining motion
 }
 
 //--------------------------
@@ -265,53 +265,53 @@ void setup() {
 	init_ultrasound();
 	calibrate_IMU();
 	led(OFF);
-  while (Serial.available()) Serial.read(); // Flush input buffer
+	while (Serial.available()) Serial.read(); // Flush input buffer
 	Serial.println("READY");
 }
 
 void loop() {
 	if (Serial.available()) {
-    String line = Serial.readStringUntil('\n');
-    line.trim(); // Skip initial garbage (\n \r and spaces)
-    if ( line.length() >= 2 ) {
-      String command = line.substring(0, 2); // Extract the first two letters
-      String value = line.substring(2); // Extract the rest of the message
-  		led(ON);
-  		if (command == "PD") {
-  			pen_move(DOWN);
-  			Serial.println("OK");
+		String line = Serial.readStringUntil('\n');
+		line.trim(); // Skip initial garbage (\n \r and spaces)
+		if (line.length() >= 2) {
+			String command = line.substring(0, 2); // Extract the first two letters
+			String value = line.substring(2); // Extract the rest of the message
+			led(ON);
+			if (command == "PD") {
+				pen_move(DOWN);
+				Serial.println("OK");
 
-  		} else if (command == "PU") {
-  			pen_move(UP);
-  			Serial.println("OK");
+			} else if (command == "PU") {
+				pen_move(UP);
+				Serial.println("OK");
 
-  		} else if (command == "FD") {
-  			actuate_motors(value.toInt(), 0);
-  			Serial.println("OK");
+			} else if (command == "FD") {
+				actuate_motors(value.toInt(), 0);
+				Serial.println("OK");
 
-  		} else if (command == "BK") {
-  			actuate_motors(-value.toInt(), 0);
-  			Serial.println("OK");
+			} else if (command == "BK") {
+				actuate_motors(-value.toInt(), 0);
+				Serial.println("OK");
 
-  		} else if (command == "RT") {
-  			actuate_motors(0, -value.toInt());
-  			Serial.println("OK");
-  
-  		} else if (command == "LT") {
-  			actuate_motors(0, value.toInt());
-  			Serial.println("OK");
+			} else if (command == "RT") {
+				actuate_motors(0, -value.toInt());
+				Serial.println("OK");
 
-  		} else if (command == "OE") {
-        int dist = measure_distance_cm_filtered(10);
-        Serial.println(dist);
+			} else if (command == "LT") {
+				actuate_motors(0, value.toInt());
+				Serial.println("OK");
 
-      } else if (command == "CA") {
-        calibrate_motors();
-        Serial.println("OK");
+			} else if (command == "OE") {
+				int dist = measure_distance_cm_filtered(10);
+				Serial.println(dist);
 
-      } else Serial.println("ERROR: UNKNOWN COMMAND");
-  		led(OFF);
-    }
+			} else if (command == "CA") {
+				calibrate_motors();
+				Serial.println("OK");
+
+			} else Serial.println("ERROR: UNKNOWN COMMAND");
+			led(OFF);
+		}
 	}
 	//integrate_IMU(); // do not integrate rotations while the robot is static
 }

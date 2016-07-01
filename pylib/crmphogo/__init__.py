@@ -10,7 +10,7 @@ import getpass
 
 from os.path import dirname
 
-_test_robot = '1'
+_test_robot = '3'
 
 logged_as = getpass.getuser()
 user = re.search(r'\d+$', logged_as)

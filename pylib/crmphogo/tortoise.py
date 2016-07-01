@@ -59,7 +59,7 @@ class _TortoiseBT(object):
                     self.bt_socket = bt.BluetoothSocket(bt.RFCOMM)
                     self.bt_socket.connect((self._host, self._port))
                 except BluetoothError as bte:
-                    pass
+                    print(bte)
                 else:
                     self.bt_socket.settimeout(5)
                     # apparently, it needs a timeout

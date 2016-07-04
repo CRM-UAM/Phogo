@@ -290,17 +290,20 @@ void checkBattery() {
 void setup() {
     init_led();
     led(ON);
-    String msg = "READY (";
-    delay(400);
-    Serial.begin(19200);
-    init_IMU();
-    pen_move(UP);
-    init_ultrasound();
-    calibrate_IMU();
-    while (Serial.available()) Serial.read(); // Flush input buffer
-    msg += readVcc();
-    msg += ")";
-    Serial.println(msg);
+    checkBattery();
+    if (!low_battery) {
+        String msg = "READY (";
+        delay(400);
+        Serial.begin(19200);
+        init_IMU();
+        pen_move(UP);
+        init_ultrasound();
+        calibrate_IMU();
+        while (Serial.available()) Serial.read(); // Flush input buffer
+        msg += readVcc();
+        msg += ")";
+        Serial.println(msg);
+    }
     led(OFF);
 }
 

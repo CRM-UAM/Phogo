@@ -20,5 +20,9 @@ from shapes import star
 #EmpezarADibujar()
 #DejarDeDibujar()
 #d = LeerSensor()
+#print(d)
 
-star(7, 3, 8)
+#star(17, 5, 4)
+
+while True:
+    Avanzar()

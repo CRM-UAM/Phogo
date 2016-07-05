@@ -35,14 +35,13 @@ chassis_width = servo_separation+2*8;
 chassis_len = 70+chassis_width/2;
 chassis_corner_radius = chassis_thirdstand_diameter/2;
 
-screw_diam = 3.5; // diameter for tight fit
-screw_tolerance = 0.5; // loose fit
+screw_diam = 4; // diameter for tight fit
 
 ultrasound_posY = -chassis_width/2+21;
 ultrasound_support_len = 8;
 ultrasound_support_X = 10;
 ultrasound_support_Y = 2.5;
-ultrasound_support_tolerance = 0.5;
+ultrasound_support_tolerance = 0.8;
 ultrasound_support_thickness = 2;
 
 module pen_support_vitamins() {
@@ -61,10 +60,10 @@ module pen_support(holes=false) {
         cylinder(r1=pen_diameter/2+pen_holder_tolerance, r2=pen_diameter/2+2*pen_holder_tolerance, h=chassis_thickness+0.1);
         // Agujeros para sujetar el mini-servo
         translate([-3+pen_holder_Xoffset,-9-pen_diameter/2,0]) cube([3,14,chassis_thickness*3],center=true);
-        translate([-11+pen_holder_Xoffset,-pen_diameter/2-2,0]) cube([5,2,chassis_thickness*3],center=true);
-        translate([-11+pen_holder_Xoffset,-pen_diameter/2-16,0]) cube([5,2,chassis_thickness*3],center=true);
+        translate([-11+pen_holder_Xoffset,-pen_diameter/2-2,0]) cube([6,3,chassis_thickness*3],center=true);
+        translate([-11+pen_holder_Xoffset,-pen_diameter/2-16,0]) cube([6,3,chassis_thickness*3],center=true);
         // Agujero para el cable del mini-servo
-        translate([-26+pen_holder_Xoffset,-9-pen_diameter/2,0]) cube([4,10,chassis_thickness*3],center=true);
+        translate([-26+pen_holder_Xoffset,-9-pen_diameter/2,0]) cube([4,11,chassis_thickness*3],center=true);
         // Agujeros para los cables de la electronica
         translate([0,pen_diameter/2+pen_holder_thickness+6/2,0]) cube([15,6,chassis_thickness*3],center=true);
         translate([0,chassis_len-chassis_width/2-5,0]) cube([15,6,chassis_thickness*3],center=true);
@@ -83,17 +82,17 @@ module pen_holder() {
                     rotate([180,0,0]) cylinder(r=15+pen_diameter/2, h=100);
                 }
             }
-            translate([0,0,-1]) cylinder(r1=pen_diameter/2+2*pen_holder_tolerance,r2=pen_diameter/2-2*pen_holder_tolerance, h=15+pen_diameter/2+2);
+            translate([0,0,-1]) cylinder(r1=pen_diameter/2+pen_holder_tolerance,r2=pen_diameter/2-4*pen_holder_tolerance, h=15+pen_diameter/2+2);
         }
     }
 
 module continuous_rotation_servo(holes=false,wheel=false) {
     if(holes) {
         // Agujeros para las bridas
-        translate([-2.5,-15,0]) cube([2,5,chassis_thickness*3],center=true);
-        translate([2.5,-15,0]) cube([2,5,chassis_thickness*3],center=true);
-        translate([-2.5,50-15,0]) cube([2,5,chassis_thickness*3],center=true);
-        translate([2.5,50-15,0]) cube([2,5,chassis_thickness*3],center=true);
+        translate([-2.5,-15,0]) cube([2.5,6,chassis_thickness*3],center=true);
+        translate([2.5,-15,0]) cube([2.5,6,chassis_thickness*3],center=true);
+        translate([-2.5,50-15,0]) cube([2.5,6,chassis_thickness*3],center=true);
+        translate([2.5,50-15,0]) cube([2.5,6,chassis_thickness*3],center=true);
     } else {
         color("gray") futabas3003([-28,30,-20], [0,-90,180]);
         if(wheel) translate([12,0,-10]) rotate([0,90,0]) {

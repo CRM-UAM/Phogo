@@ -256,7 +256,7 @@ void actuate_motors(float distanceGoal, float targetAngleDeg) {
 //--------------------------
 // ****  BATTERY LEVEL  ****
 //--------------------------
-#define LOW_BAT_THRESHOLD 5050 // mV
+/*#define LOW_BAT_THRESHOLD 5050 // mV
 #define BATTERY_CHECK_INTERVAL 10000 // ms
 
 long battery_last_measure = 0;
@@ -282,7 +282,7 @@ void checkBattery() {
             low_battery = true;
         }
     }
-}
+}*/
 
 //--------------------------
 // ****    MAIN         ****
@@ -291,19 +291,19 @@ void setup() {
     init_led();
     led(ON);
     //checkBattery();
-    if (!low_battery) {
-        String msg = "READY (";
-        delay(400);
-        Serial.begin(19200);
-        init_IMU();
-        pen_move(UP);
-        init_ultrasound();
-        calibrate_IMU();
-        while (Serial.available()) Serial.read(); // Flush input buffer
-        msg += readVcc();
-        msg += ")";
-        Serial.println(msg);
-    }
+    //if (!low_battery) {
+    String msg = "READY (";
+    delay(400);
+    Serial.begin(19200);
+    init_IMU();
+    pen_move(UP);
+    init_ultrasound();
+    calibrate_IMU();
+    while (Serial.available()) Serial.read(); // Flush input buffer
+    msg += readVcc();
+    msg += ")";
+    Serial.println(msg);
+    //}
     led(OFF);
 }
 

@@ -54,14 +54,14 @@ tortoise = crm.Tortoise(macs[user])
 simulated = tortoise.simulated
 real = tortoise.real
 
-pendown = tortoise.pendown
-penup = tortoise.penup
+pen_down = tortoise.pendown
+pen_up = tortoise.penup
 forward = tortoise.forward
-backward = tortoise.backward
+back = tortoise.backward
 right = tortoise.right
 left = tortoise.left
-distance = tortoise.read_sensor
+obstacle = tortoise.read_sensor
 
 # and export them
-__all__ = ['simulated', 'real', 'pendown', 'penup',
-           'forward', 'backward', 'right', 'left', 'distance']
+__all__ = ['simulated', 'real', 'pen_down', 'pen_up',
+           'forward', 'back', 'right', 'left', 'obstacle']

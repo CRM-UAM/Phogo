@@ -1,0 +1,9 @@
+- Hacerse con la IP de ordenadores del laboratorio.
+- Configurarla en los servidores.
+- Conectar las tortugas a los ordenadores.
+- Abrir la conexión ssh.
+- Abrir el idle.
+- Configurar en el idle que el tamaño de letra sea mayor y que al hacer F5 no te pregunte si quieres guardar (Preferencias -> pestañas de fuente y general, respectivamente)
+- Abrirles un fichero en blanco.
+- Guardarlo en el directorio de cada usuario.
+- Abrirles la guía docente, por si quiere consultarla.

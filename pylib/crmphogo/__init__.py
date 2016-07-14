@@ -51,14 +51,17 @@ print(turtle)
 tortoise = crm.Tortoise(macs[user])
 
 # define the wrappers
-EmpezarADibujar = tortoise.start_drawing
-DejarDeDibujar = tortoise.stop_drawing
-Avanzar = tortoise.forward
-Retroceder = tortoise.backward
-GirarDerecha = tortoise.turn_right
-GirarIzquierda = tortoise.turn_left
-LeerSensor = tortoise.read_sensor
+simulated = tortoise.simulated
+real = tortoise.real
+
+pen_down = tortoise.pendown
+pen_up = tortoise.penup
+forward = tortoise.forward
+back = tortoise.backward
+right = tortoise.right
+left = tortoise.left
+obstacle = tortoise.read_sensor
 
 # and export them
-__all__ = ['EmpezarADibujar', 'DejarDeDibujar', 'Avanzar',
-           'Retroceder', 'GirarDerecha', 'GirarIzquierda', 'LeerSensor']
+__all__ = ['simulated', 'real', 'pen_down', 'pen_up',
+           'forward', 'back', 'right', 'left', 'obstacle']

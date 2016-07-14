@@ -27,10 +27,16 @@ except:
     pass
 
 from time import sleep
+from .tortoise_turtle import Turtle
 
 
 class TortoiseError(Exception):
     pass
+
+
+def TortoiseBT(*args, **kwargs):
+    """wrapper"""
+    return _TortoiseBT(args, kwargs)
 
 
 class _TortoiseBT(object):
@@ -44,11 +50,17 @@ class _TortoiseBT(object):
         self._port = port
         self._delay = connection_delay
         self._connected = False
-        try:
-            self._connect()
-        except TortoiseError as te:
-            print(te)
-            sys.exit(1)
+        self._timeout = 5
+
+    @property
+    def timeout(self):
+        return self._timeout
+
+    @timeout.setter
+    def timeout(self, value):
+        self._timeout = max(5.0, float(value))
+        if self.bt_socket:
+            self.bt_socket.settimeout(self._timeout)
 
     def _connect(self):
         if not self._connected:
@@ -61,9 +73,7 @@ class _TortoiseBT(object):
                 except BluetoothError as bte:
                     print(bte)
                 else:
-                    self.bt_socket.settimeout(5)
-                    # apparently, it needs a timeout
-                    # sleep(self._delay)
+                    self.bt_socket.settimeout(self._timeout)  # initial timeout
                     print(" OK")
                     break
             else:
@@ -104,6 +114,9 @@ class _TortoiseBT(object):
             self.bt_socket.close()
             self._connected = False
 
+    def is_connected(self):
+        return self._connected
+
     def __repr__(self):
         return str(self._host)
 
@@ -114,23 +127,31 @@ class Tortoise(object):
     def __init__(self, mac):
         """Inicia el objeto con la MAC con la que se va a comunicar."""
 
+        self._simulated = False
+        self._turtle = None
+
         # tiene que ser una MAC valida
         if re.match(r'[0-9a-fA-F]{2}([-:])[0-9a-fA-F]{2}(\1[0-9a-fA-F]{2}){4}$', mac):
             self._bt = _TortoiseBT(mac)
-            print(self, '->', self._bt.receive().strip().upper())
         else:
             raise TortoiseError("MAC is invalid")
 
-    def start_drawing(self):
+    def simulated(self):
+        self._simulated = True
+
+    def real(self):
+        self._simulated = False
+
+    def pendown(self):
         """Empieza a dibujar"""
-        #print(self, "-> start_drawing")
+        #print(self, "-> pendown")
         cmd = 'PD'
         if not self._communicate(cmd, convert_func=lambda x: str(x).strip().upper()) == 'OK':
             sys.exit(1)
 
-    def stop_drawing(self):
+    def penup(self):
         """Deja de dibujar"""
-        #print(self, "-> stop_drawing")
+        #print(self, "-> penup")
         cmd = 'PU'
         if not self._communicate(cmd, convert_func=lambda x: str(x).strip().upper()) == 'OK':
             sys.exit(1)
@@ -139,6 +160,7 @@ class Tortoise(object):
         """Avanza"""
         #print(self, "-> forward", units)
         cmd = 'FD {}'.format(units)
+        self._bt.timeout = units
         if not self._communicate(cmd, convert_func=lambda x: str(x).strip().upper()) == 'OK':
             sys.exit(1)
 
@@ -146,19 +168,20 @@ class Tortoise(object):
         """Retrocede"""
         #print(self, "-> backward", units)
         cmd = 'BK {}'.format(units)
+        self._bt.timeout = units
         if not self._communicate(cmd, convert_func=lambda x: str(x).strip().upper()) == 'OK':
             sys.exit(1)
 
-    def turn_right(self, deg=90):
+    def right(self, deg=90):
         """Gira en sentido horario, 90º por defecto"""
-        #print(self, "-> turn_right", deg)
+        #print(self, "-> right", deg)
         cmd = 'RT {}'.format(deg)
         if not self._communicate(cmd, convert_func=lambda x: str(x).strip().upper()) == 'OK':
             sys.exit(1)
 
-    def turn_left(self, deg=90):
+    def left(self, deg=90):
         """Gira en sentido antihorario, 90º por defecto"""
-        #print(self, "-> turn_left", deg)
+        #print(self, "-> left", deg)
         cmd = 'LT {}'.format(deg)
         if not self._communicate(cmd, convert_func=lambda x: str(x).strip().upper()) == 'OK':
             sys.exit(1)
@@ -175,19 +198,37 @@ class Tortoise(object):
 
     def _communicate(self, data, convert_func=lambda x: x):
         """Envia y recibe"""
-        print(self, '{:<10} -> '.format(data), end='')
-        try:
-            if len(data) + 1 == self._bt.send(data + '\n'):  # sending worked
-                r = convert_func(self._bt.receive())
-                print(r)
-                return r
-        except TortoiseError as te:
+        print('Enviando comando:', '{:<10} -> '.format(data), end='')
+
+        if self._simulated:
+            if self._turtle == None:
+                self._turtle = Turtle()
+            r = self._turtle.command(data)
+            r = convert_func(r)
+            print(r)
+            return r
+        else:
+            if not self._bt.is_connected():
+                try:
+                    self._bt._connect()
+                    print(self, '->', self._bt.receive().strip().upper())
+                except TortoiseError as te:
+                    print(te)
+                    sys.exit(1)
+
+            try:
+                if len(data) + 1 == self._bt.send(data + '\n'):  # sending worked
+                    r = convert_func(self._bt.receive())
+                    print(r)
+                    return r
+            except TortoiseError as te:
+                print('ERROR')
+                self._bt.disconnect()
+                print(te, file=sys.stderr)
+                sys.exit(1)
+            # if OK, should not get here
             print('ERROR')
-            self._bt.disconnect()
-            print(te, file=sys.stderr)
-            sys.exit(1)
-        # if OK, should not get here
-        print('ERROR')
+
         return None  # return None to evaluate False on any command
 
     def __repr__(self):

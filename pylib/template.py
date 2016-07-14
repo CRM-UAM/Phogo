@@ -4,25 +4,23 @@
 # https://github.com/CRM-UAM/Phogo
 # Released under the GNU General Public License Version 3
 # Club de Robotica-Mecatronica, Universidad Autonoma de Madrid, Spain
+
 from crmphogo import *
-from shapes import star
-##################################################
-#                                                #
-#       WRITE CODE FROM THIS BLOCK ONWARDS       #
-#                                                #
+
+from shapes import star, koch_flake
+
 ##################################################
 
+simulated()
 
-#Avanzar()
-#Retroceder()
-#GirarDerecha()
-#GirarIzquierda()
-#EmpezarADibujar()
-#DejarDeDibujar()
-#d = LeerSensor()
-#print(d)
+# pendown()
+# forward()
+# backward()
+# right()
+# left()
+#d = distance()
+# print(d)
+# penup()
 
-#star(17, 5, 4)
 
-while True:
-    Avanzar()
+star(5, 3, 30)

@@ -58,7 +58,7 @@ class _TortoiseBT(object):
 
     @timeout.setter
     def timeout(self, value):
-        self._timeout = float(value)
+        self._timeout = max(5.0, float(value))
         if self.bt_socket:
             self.bt_socket.settimeout(self._timeout)
 

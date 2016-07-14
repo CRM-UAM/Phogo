@@ -13,14 +13,14 @@ from shapes import star, koch_flake
 
 simulated()
 
-# pen_down()
+# pendown()
 # forward()
-# back()
+# backward()
 # right()
 # left()
-#d = obstacle()
+#d = distance()
 # print(d)
-# pen_up()
+# penup()
 
 
-koch_flake(5, 5)
+star(5, 3, 30)

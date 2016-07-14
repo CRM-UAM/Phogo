@@ -6,9 +6,9 @@ def star(n_vertices=5, alternos=2, longitud=10):
     if 2 < 2 * alternos < n_vertices and gcd(n_vertices, alternos) == 1:
         angle = 180 - (180 * (n_vertices - 2 * alternos) // n_vertices)
         for i in range(n_vertices):
-            pendown()
+            pen_down()
             forward(longitud)
-            penup()
+            pen_up()
             right(angle)
     else:
         print('Parametros imposibles')
@@ -19,7 +19,7 @@ def koch_flake(numIter, longitud=10):
         return path.replace("A", "AIADDAIA")
 
     def draw(path, longitud=30):
-        pendown()
+        pen_down()
         for letter in path:
             if letter == "A":
                 forward(longitud)

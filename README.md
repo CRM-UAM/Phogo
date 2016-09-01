@@ -9,12 +9,8 @@ You can find more information in the [project's wiki page](https://github.com/CR
 
 _Toda la información está en la [wiki del proyecto](https://github.com/CRM-UAM/Phogo/wiki). ¿No encuentras algo? [Contacta con nosotros](https://github.com/CRM-UAM/Phogo/issues/new)._
 
-
-![](Media_files/photo9010957807364952.jpg)  
-Phogo robot proudly drawing a small square. _Robot Phogo dibujando un pequeño cuadrado._
-
-![](3D_design/robot.png)  
-3D-printable CAD robot design. Find it in [[3D_design]]. _Diseño CAD imprimible en 3D. Puedes encontrarlo en [[3D_design]]_
+<img src="3D_design/robot.png" width="425"/> <img src="Media_files/photo9010957807364952.jpg" width="425"/>  
+3D-printable CAD robot design. Find it in [3D_design](3D_design). _Diseño CAD imprimible en 3D. Puedes encontrarlo en [3D_design](3D_design)_
 
 
 License
@@ -30,8 +26,8 @@ El resto de elementos como textos, imágenes o manuales bajo una licencia [CC BY
 Authors
 =
 
-- Pablo Molins Ruano (@molins)
-- Carlos Gonzalez Sacristán (@ChacheGS)
-- Carlos García Saura (@CarlosGS)
+- Pablo Molins Ruano ([@molins](https://github.com/molins))
+- Carlos Gonzalez Sacristán ([@ChacheGS](https://github.com/ChacheGS))
+- Carlos García Saura ([@CarlosGS](https://github.com/CarlosGS))
 
 

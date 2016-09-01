@@ -11,7 +11,7 @@ Can't find what you are looking for? [Contact us](https://github.com/CRM-UAM/Pho
 ***Toda la información está en la [wiki del proyecto](https://github.com/CRM-UAM/Phogo/wiki).***
 _¿No encuentras algo? [Contacta con nosotros](https://github.com/CRM-UAM/Phogo/issues/new)._
 
-<img src="3D_design/robot.png" width="425"/> <img src="Media_files/photo9010957807364952.jpg" width="425"/>  
+<img src="3D_design/phogo.png" width="425"/> <img src="Media_files/phogo_drawing_square.jpg" width="425"/>  
 3D-printable CAD robot design. Find it in [3D_design](3D_design). _Diseño CAD imprimible en 3D. Puedes encontrarlo en [3D_design](3D_design)_
 
 

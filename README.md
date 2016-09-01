@@ -21,8 +21,8 @@ License
 All of the Phogo source code is released under the [GNU General Public License Version 3](http://www.gnu.org/licenses/gpl-3.0.html).  
 The rest of elements such as text, images or manuals are published under the [CC BY-SA 4.0 license terms](https://creativecommons.org/licenses/by-sa/4.0/).  
 
-Todo el código fuente de Phogo está publicado bajo una licencia [GNU General Public License Version 3](http://www.gnu.org/licenses/gpl-3.0.html).  
-El resto de elementos como textos, imágenes o manuales bajo una licencia [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/).  
+_Todo el código fuente de Phogo está publicado bajo una licencia [GNU General Public License Version 3](http://www.gnu.org/licenses/gpl-3.0.html)._  
+_El resto de elementos como textos, imágenes o manuales bajo una licencia [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/)._  
 
 
 Authors

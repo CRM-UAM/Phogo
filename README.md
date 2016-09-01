@@ -5,9 +5,11 @@ Phogo is an educational project to learn how to program. It is based in the [Log
 _Phogo es un proyecto educativo para aprender a programar basado en el lenguaje de programación [Logo](https://en.wikipedia.org/wiki/Logo_(programming_language)) (y su tortuga) creado en 1967 por Seymour Papert y otros investigadores._
 
 
-You can find more information in the [project's wiki page](https://github.com/CRM-UAM/Phogo/wiki). Couldn't find what you were looking for? [Contact us](https://github.com/CRM-UAM/Phogo/issues/new).
+**You can find more information in the [project's wiki page](https://github.com/CRM-UAM/Phogo/wiki).**
+Can't find what you are looking for? [Contact us](https://github.com/CRM-UAM/Phogo/issues/new).
 
-_Toda la información está en la [wiki del proyecto](https://github.com/CRM-UAM/Phogo/wiki). ¿No encuentras algo? [Contacta con nosotros](https://github.com/CRM-UAM/Phogo/issues/new)._
+***Toda la información está en la [wiki del proyecto](https://github.com/CRM-UAM/Phogo/wiki).***
+_¿No encuentras algo? [Contacta con nosotros](https://github.com/CRM-UAM/Phogo/issues/new)._
 
 <img src="3D_design/robot.png" width="425"/> <img src="Media_files/photo9010957807364952.jpg" width="425"/>  
 3D-printable CAD robot design. Find it in [3D_design](3D_design). _Diseño CAD imprimible en 3D. Puedes encontrarlo en [3D_design](3D_design)_

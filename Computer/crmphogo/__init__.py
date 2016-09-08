@@ -5,6 +5,7 @@
 # Club de Robotica-Mecatronica, Universidad Autonoma de Madrid, Spain
 from __future__ import print_function  # python2 compatibility
 
+import sys
 import re
 import getpass
 
@@ -15,13 +16,17 @@ _test_robot = '3'
 logged_as = getpass.getuser()
 user = re.search(r'\d+$', logged_as)
 # para testear usamos un robot en concreto, sin depender del usuario
-user = user.group() if user else _test_robot
+robot = user.group() if user else _test_robot
 
 import json
-with open(dirname(__file__) + "/all_robots.json", "r") as rbts:
-    macs = json.loads(rbts.read())
+try:
+    with open(dirname(__file__) + "/all_robots.json", "r") as rbts:
+        macs = json.loads(rbts.read())
+except:
+    print("Failed to load configuration file")
+    sys.exit(1)
 
-print("Using robot:", user, "{{{}}}".format(macs[user]))
+print("Using robot:", robot, "{{{}}}".format(macs[robot]))
 
 import crmphogo.tortoise as crm
 # __logo_source:

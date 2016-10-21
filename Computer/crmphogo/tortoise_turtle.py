@@ -74,4 +74,4 @@ class _Turtle(object):
         return 'OK'
 
     def _OE(self):
-        return randint(1, 300)
+        return randint(10, 300)

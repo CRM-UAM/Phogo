@@ -1,4 +1,4 @@
-#!/usr/bin/python3.4
+#!/usr/bin/python3
 # -*- coding: utf-8 -*-
 # This source file is part of the Phogo project
 # https://github.com/CRM-UAM/Phogo
@@ -11,16 +11,14 @@ from shapes import star, koch_flake
 
 ##################################################
 
-simulated()
-
-# pendown()
-# forward()
-# backward()
-# right()
-# left()
-#d = distance()
-# print(d)
-# penup()
+pen_down()
+forward()
+back()
+right()
+left()
+d = obstacle()
+print(d)
+pen_up()
 
 
-star(5, 3, 30)
+#star(5, 3, 30)

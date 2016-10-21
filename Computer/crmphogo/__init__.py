@@ -26,7 +26,10 @@ except:
     print("Failed to load configuration file")
     sys.exit(1)
 
-print("Using robot:", robot, "{{{}}}".format(macs[robot]))
+"""yatame"""
+
+mac = macs[robot]
+print("Using robot:", robot, "{{{}}}".format(mac))
 
 import crmphogo.tortoise as crm
 # __logo_source:
@@ -45,15 +48,15 @@ turtle = r'''
    \         ||           \______________/      _-_       //\__//
      \       ||------_-~~-_ ------------- \ --/~   ~\    || __/
        ~-----||====/~   /_|==================|       |/~~~~~
-        (_(__/  ./     /                    \_\      \.
-               (_(___/                         \_____)_)
+        (_(__/   ./    /                    \_\      \.
+                (_(___/                        \_____)_)
                               PHOGO
                              CRM-UAM
 '''
 print(turtle)
 
 #tortoise = crm.Tortoise(dirname(crm.__file__) + "/robot_bt_mac.txt")
-tortoise = crm.Tortoise(macs[user])
+tortoise = crm.Tortoise(mac)
 
 # define the wrappers
 simulated = tortoise.simulated

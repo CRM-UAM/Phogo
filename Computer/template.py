@@ -7,18 +7,22 @@
 
 from crmphogo import *
 
-from shapes import star, koch_flake
+from shapes import circle, star, koch_flake
 
 ##################################################
 
-pen_down()
-forward()
-back()
-right()
-left()
-d = obstacle()
-print(d)
-pen_up()
+#pen_down()
+#forward()
+#back()
+#right()
+#left()
+#d = obstacle()
+#print(d)
+#pen_up()
 
 
 #star(5, 3, 30)
+
+circle(10.5)
+#right()
+forward(21)

@@ -29,7 +29,7 @@ Authors
 =
 
 - Pablo Molins Ruano ([@molins](https://github.com/molins))
-- Carlos Gonzalez Sacristán ([@ChacheGS](https://github.com/ChacheGS))
+- Carlos González Sacristán ([@ChacheGS](https://github.com/ChacheGS))
 - Carlos García Saura ([@CarlosGS](https://github.com/CarlosGS))
 
 <img src="Media_files/1stPhogoWorkshop_MolinsChacheCarlos.jpg" width="425"/>  
